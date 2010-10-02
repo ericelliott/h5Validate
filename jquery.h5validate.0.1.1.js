@@ -1,6 +1,6 @@
 /**
  * h5Validate
- * @version v0.1.0
+ * @version v0.1.1
  * Using semantic versioning: http://semver.org/
  * @author Eric Hamilton dilvie@dilvie.com
  * @copyright 2010 Eric Hamilton
@@ -10,12 +10,7 @@
 /*global jQuery */
 /*jslint browser: true, devel: true, onevar: true, undef: true, nomen: true, eqeqeq: true, bitwise: true, regexp: true, newcap: true, immed: true */
 (function ($) {
-	var settings = {
-			debug: true
-		},
-
-		// Public API
-		h5 = { 
+	var h5 = { // Public API
 			// Public HTML5-compatible validation pattern library that can be extended and/or overriden.
 			// **TODO: This bit is not implemented yet. Use namespaced class names to address these in the HTML.
 			patternLibrary : {
@@ -26,6 +21,8 @@
 				invalid : 'Please correct this field.'
 			},
 			defaults : {
+				debug: true,
+				
 				errorClass: 'ui-state-error',
 				validClass: 'ui-state-valid',
 	
@@ -69,22 +66,24 @@
 					$(element.form).find("#" + element.id).removeClass(errorClass).removeClass(validClass);
 					return $(element);
 				},	
-				validate: function () {
+				validate: function (settings) {
 						// Get the HTML5 pattern attribute if it exists.
 						// ** TODO: If a pattern class exists, grab the pattern from the patternLibrary, but the pattern attrib should override that value.
-					var pattern = $(this).filter('[pattern]')[0] ? $(this).attr('pattern') : false,
+					var $this = $(this),
+						pattern = $this.filter('[pattern]')[0] ? $this.attr('pattern') : false,
 	
 						// The pattern attribute must match the whole value, not just a subset:
 						// "...as if it implied a ^(?: at the start of the pattern and a )$ at the end."
 						re = new RegExp('^(?:' + pattern + ')$'),
-						value = $(this).val(),
-						required = ($(this).attr('required') !== null) ? true : false, // If the required attribute exists, set it required to true.
+						value = $this.val(),
+						required = ($this.attr('required') !== null) ? true : false, // If the required attribute exists, set it required to true.
 						errorClass = settings.errorClass,
 						validClass = settings.validClass,
-						errorIDbare = $(this).attr(settings.errorAttribute) || false, // Get the ID of the error element.
+						errorIDbare = $this.attr(settings.errorAttribute) || false, // Get the ID of the error element.
 						errorID = errorIDbare ? '#' + errorIDbare : false; // Add the hash for convenience. This is done in two steps to avoid two attribute lookups.
 					
 					if (settings.debug) {
+						console.log(JSON.stringify(this));
 						console.log('Validate called on "' + value + '" with regex "' + re + '".'); // **DEBUG
 						console.log('Regex test: ' + re.test(value) + ', Pattern: ' + pattern); // **DEBUG
 					}
@@ -109,9 +108,12 @@
 			 * @param {object} eventFlags The object containing event flags.
 			 * @returns {array} A new array containing only the true event names.
 			 */
-			delegateEvents: function (selectors, eventFlags, element) {
+			delegateEvents: function (selectors, eventFlags, element, settings) {
 				var events = [],
-					i = 0;
+					i = 0,
+					validate = function () {
+						settings.validate.call(this, settings);
+					};
 				$.each(eventFlags, function (key, value) {
 					if (value) {
 						events[key] = key;
@@ -121,12 +123,12 @@
 				for (i in events) {
 					if (events.hasOwnProperty(i)) {
 						console.log(events[i] + ', ' + selectors); //**DEBUG
-						$(element).delegate(selectors, events[i] + '.h5Validate', settings.validate);
+						$(element).delegate(selectors, events[i] + '.h5Validate', validate);
 					}
 				}
 				return events;
 			},
-			bindDelegation: function () {
+			bindDelegation: function (settings) {
 				return this.each(function () {
 					var	kbEvents = {
 							focusout: settings.focusout,
@@ -138,20 +140,20 @@
 							click: settings.click
 						};
 
-					kbEvents = methods.delegateEvents(settings.kbSelectors, kbEvents, this);
-					mEvents = methods.delegateEvents(settings.mSelectors, mEvents, this);
+					kbEvents = methods.delegateEvents(settings.kbSelectors, kbEvents, this, settings);
+					mEvents = methods.delegateEvents(settings.mSelectors, mEvents, this, settings);
 				});
 			}
 		};
 
 	$.fn.h5Validate = function (options) {
 		// Combine defaults and options to get current settings.
-		settings = $.extend({}, settings, defaults, options);
+		var settings = $.extend({}, settings, defaults, options);
 
 		// Expose public API.
 		$.extend($.fn.h5Validate, h5);
 
 		// Returning the jQuery object allows for method chaining.
-		return methods.bindDelegation.apply(this, arguments);
+		return methods.bindDelegation.call(this, settings);
 	};	
 }(jQuery));
