@@ -2,7 +2,7 @@
 
 A jQuery plugin that understands HTML5 forms and knows how to validate them, even in browsers that don't yet support HTML5.
 
-In browsers that do support HTML5, v5Validate adds some much-needed features, such as the ability to customize the user interface when an input fails validation.
+In browsers that do support HTML5, h5Validate adds some much-needed features, such as the ability to customize the user interface when an input fails validation.
 
 ## Jump Start
 
