@@ -67,7 +67,7 @@
 		</style>
 	</head>
 	<body>
-		<h1>h5Validate v0.1.3 - HTML5 Form Validation for jQuery</h1>
+		<h1>h5Validate v0.2.0 - HTML5 Form Validation for jQuery</h1>
 
 		<a class="button" href="http://github.com/dilvie/h5Validate/archives/master">Download from Github</a>
 
@@ -111,6 +111,12 @@
 		
 		<script src="http://gist.github.com/607739.js?file=h5-pattern-demo-part.html"></script>
 
+		<h3>Pattern Library</h3>
+		
+		<p>Sometimes, you'll want to re-use the same validation pattern for several elements on a page. You could copy and paste the same pattern over and over again to a bunch of different form fields, but what happens if you discover a bug in the pattern? Fix it and repeat the whole copy and paste process?</p>
+		
+		<p>A better solution is to attach the pattern with a class selector. Use <a href="#addPatterns"><code>$.h5Validate.addPatterns()</code></a> to add your pattern, make sure the classPrefix variable is set correctly (it's <code>h5-</code> by default), and add the class to the input fields.</p>
+
 		<h2>Options</h2>
 				
 		<p>There are a <em>ton</em> of options you can override by passing key: value pairs when you call .h5Validate(). For example, we can change the CSS class that indicates validation errors:</p>
@@ -150,7 +156,42 @@
 			<code class="block">click: true</code>
 		</dd>
 
+		<div class="method">
+		<h2>Methods</h2>
 
+		<dl>
+			<a name="addPatterns" />
+			<dt>$.h5Validate.addPatterns(patterns)</dt>
+			<dd><p>Take a map of pattern names and HTML5-compatible regular
+				expressions, and add them to the patternLibrary. Patterns in
+				the library are automatically assigned to HTML element pattern
+				attributes for validation.</p>
+
+				<dl><dt>{object} patterns</dt><dd><p>A map of pattern names and
+				HTML5 compatible regular expressions.</p></dd></dl>
+
+		<h3>Demo</h3>		
+		<form id="form3">
+		<label for="phone">Your Phone Number:</label>
+		<input class="h5-phone" id="phone" name="phone" type="text" placeholder="555-555-5555" title="555-555-5555" />
+		</form>
+				
+		<h3>Source:</h3>
+		
+		<script src="http://gist.github.com/612886.js?file=h5-class-selectors-part.html"></script>		
+
+		<p>The <code>class="h5-phone"</code> bit is the part doing the magic. The <code>h5-</code> prefix tells you that this class is a handle that we can use to attach validation rules to. Internally, we just tack this prefix to the front of the pattern names to get the right selectors.</p>
+
+		<p>In your JavaScript, specify the pattern name <em>without</em> the class prefix. Keeping the prefix off lets us easily share and re-use pattern libraries between projects.</p>
+
+		<script src="http://gist.github.com/612886.js?file=h5-custom-pattern-part.js"></script>
+
+
+				
+
+			</dd>
+		</dl>
+		</div>
 		
 		<h3>Coming soon!</h3>
 		
@@ -158,16 +199,19 @@
 		<dt>submit</dt><dd><p>(Event) Set true to trigger validation on submit. Submit needs a special handler, because it needs to check that all fields are valid, optionally save data, and optionally submit the form. Will have Ajax, get, and post. Default:</p>
 			<code class="block">submit: true</code>
 		</dd>
-		<dt>patternLibrary</dt><dd><p>A library of pattern expressions that you can attach with the class attribute, instead of embedding the same pattern many times in your markup. This is good, because you might want to re-use a pattern, and there's only one bug to fix if the pattern needs to be fixed later. Sure beats search and replace!</p></dd>
 		
 		<dt>messages</dt><dd><p>Error messages to display. This is here so that you can easily swap them out. You might want to write your own error messages, or provide language translations.</p></dd>		
 		</dl>
 
 		<script src="lib/jquery/jquery-1.4.2.min.js"></script>
-		<script src="lib/jquery.h5validate-0.1.3.js"></script>
+		<script src="lib/jquery.h5validate-0.2.0.js"></script>
 		<script>
 		$(document).ready(function() {
-		    $('#form1, #form2').h5Validate();
+
+			$.h5Validate.addPatterns({
+					phone: /([\+][0-9]{1,3}([ \.\-])?)?([\(]{1}[0-9]{3}[\)])?([0-9A-Z \.\-]{1,32})((x|ext|extension)?[0-9]{1,4}?)/				
+			});
+		    $('#form1, #form2, #form3').h5Validate();
 			$('#black').h5Validate({
 				errorClass:'black'
 			});
