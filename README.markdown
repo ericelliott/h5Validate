@@ -7,7 +7,7 @@ In browsers that do support HTML5, h5Validate adds some much-needed features, su
 ## Jump Start
 
 	<script src="lib/jquery/jquery-1.4.2.min.js"></script>
-	<script src="lib/jquery.h5validate-0.1.0.js"></script>
+	<script src="lib/jquery.h5validate-0.2.0.js"></script>
 
 	<script>
 	$(document).ready(function() {
