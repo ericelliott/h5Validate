@@ -1,6 +1,6 @@
 /**
  * h5Validate
- * @version v0.2.1
+ * @version v0.3.1
  * Using semantic versioning: http://semver.org/
  * @author Eric Hamilton dilvie@dilvie.com
  * @copyright 2010 Eric Hamilton
@@ -47,25 +47,25 @@
 
 				// The prefix to use to trigger pattern-library validation.
 				classPrefix: 'h5-',
-	
+
 				// Attribute which stores the ID of the error container element (without the hash).
 				errorAttribute: 'data-errorID',
-	
+
 				// Setup KB event delegation.
 				kbSelectors: ':text, :password, select, textarea',
 				focusout: true,
 				focusin: false,
 				change: false,
 				keyup: true,
-				
+
 				// Setup mouse event delegation.
 				mSelectors: ':radio, :checkbox, select, option',
 				click: true,
-				
+
 				// Validate on submit?
 				// **TODO: This isn't implemented, yet.
 				submit: true,
-		
+
 				// Mark field invalid.
 				// ** TODO: Highlight labels
 				// ** TODO: Implement setCustomValidity as per the spec:
@@ -74,20 +74,20 @@
 					var $element = $(element),
 						$errorID = $(errorID);
 					$element.addClass(errorClass).removeClass(validClass);
-					$element.form.find("#" + element.id).addClass(errorClass);
+					$element.find("#" + element.id).addClass(errorClass);
 					if ($errorID) {
 						$errorID.show();
 					}
 					return $element;
 		        },
-		
+
 				// Mark field valid.
 				markValid: function (element, errorClass, validClass, errorID) {
 					var $element = $(element);
 					$element.addClass(validClass).removeClass(errorClass);
 					return $element;
 				},
-		
+
 				// Unmark field
 				unmark: function (element, errorClass, validClass, errorID) {
 					var $element = $(element);
@@ -101,14 +101,14 @@
 		defaults = h5.defaults,
 		messages = defaults.messages,
 		patternLibrary = defaults.patternLibrary,
-		
+
 		methods = {
 			validate: function (settings) {
 				// Get the HTML5 pattern attribute if it exists.
 				// ** TODO: If a pattern class exists, grab the pattern from the patternLibrary, but the pattern attrib should override that value.
 				var $this = $(this),
 					pattern = $this.filter('[pattern]')[0] ? $this.attr('pattern') : false,
-		
+
 				// The pattern attribute must match the whole value, not just a subset:
 				// "...as if it implied a ^(?: at the start of the pattern and a )$ at the end."
 				re = new RegExp('^(?:' + pattern + ')$'),
@@ -128,7 +128,7 @@
 					console.log('Validate called on "' + value + '" with regex "' + re + '". Required: ' + required); // **DEBUG
 					console.log('Regex test: ' + re.test(value) + ', Pattern: ' + pattern); // **DEBUG
 				}
-			
+
 				if (required && !value) {
 					settings.markInvalid(this, 'required', errorClass, validClass, errorID);
 				} else if (pattern && !re.test(value) && value) {
@@ -204,30 +204,50 @@
 		};
 
 	$.h5Validate = {
-			/**
-			 * Take a map of pattern names and HTML5-compatible regular
-			 * expressions, and add them to the patternLibrary. Patterns in
-			 * the library are automatically assigned to HTML element pattern
-			 * attributes for validation.
-			 * 
-			 * @param {object} patterns A map of pattern names and HTML5 compatible
-			 * regular expressions.
-			 * 
-			 * @returns {object} this
-			 */
-			addPatterns : function (patterns) {
-				var patternLibrary = defaults.patternLibrary,
-					key;
-				for (key in patterns) {
-					if (patterns.hasOwnProperty(key)) {
-						patternLibrary[key] = patterns[key];
-						if (defaults.debug && window.console) {
-							console.log(patternLibrary[key]);
-						}
+		/**
+		 * Take a map of pattern names and HTML5-compatible regular
+		 * expressions, and add them to the patternLibrary. Patterns in
+		 * the library are automatically assigned to HTML element pattern
+		 * attributes for validation.
+		 * 
+		 * @param {Object} patterns A map of pattern names and HTML5 compatible
+		 * regular expressions.
+		 * 
+		 * @returns {Object} this
+		 */
+		addPatterns : function (patterns) {
+			var patternLibrary = defaults.patternLibrary,
+				key;
+			for (key in patterns) {
+				if (patterns.hasOwnProperty(key)) {
+					patternLibrary[key] = patterns[key];
+					if (defaults.debug && window.console) {
+						console.log(patternLibrary[key]);
 					}
 				}
-				return this;
 			}
+			return this;
+		},
+		/**
+		 * Take a valid jQuery selector, and a list of valid values to
+		 * validate against.
+		 * If the user input isn't in the list, validation fails.
+		 * 
+		 * @param {String} selector Any valid jQuery selector.
+		 *
+		 * @param {Array} values A list of valid values to validate selected 
+		 * fields against.
+		 */
+		validValues : function (selector, values) {
+			var i = 0,
+				ln = values.length,
+				pattern = '';
+			// Build regex pattern
+			for (i = 0; i < ln; i++) {
+				pattern = pattern ? pattern + '|' + values[i] : values[i];
+			}
+			$(selector).attr('pattern', pattern);
+		}
 	};
 
 	$.fn.h5Validate = function (options) {
