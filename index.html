@@ -1,6 +1,10 @@
 <!DOCTYPE html>
 	<head>
 		<title>h5Validate - The HTML5 Form Validation Plugin for jQuery</title>
+		<script type="text/javascript" src="http://js.getexceptional.com/exceptional.js"></script>
+		<script type="text/javascript">
+		  Exceptional.setKey('f50f8996e48810131edb6fbefce210cb70e400e9');
+		</script>
 		<style type="text/css">
 			body {
 				width:960px;
@@ -188,6 +192,18 @@
 				
 
 			</dd>
+			<br/>
+			<dt>$.h5Validate.validValues(selector, values)<dt>
+			<dd><p>Take a valid jQuery selector, and a list of valid values to
+			 validate against.</p>
+			<p>If the user input isn't in the list, validation fails.</p>
+
+			<dl>
+				<dt>{String} selector</dt><dd><p>Any valid jQuery selector.</p></dd>
+
+				<dt>{Array} values</dt><dd><p>A list of valid values to validate selected 
+					fields against.</p></dd>
+			</dl>
 		</dl>
 		</div>
 		
@@ -204,7 +220,7 @@
 		<script src="lib/jquery/jquery-1.4.2.min.js"></script>
 		<script src="jquery.h5validate.js"></script>
 		<script>
-		$(document).ready(function() {
+		$(document).ready(function () {
 
 			$.h5Validate.addPatterns({
 					phone: /([\+][0-9]{1,3}([ \.\-])?)?([\(]{1}[0-9]{3}[\)])?([0-9A-Z \.\-]{1,32})((x|ext|extension)?[0-9]{1,4}?)/				

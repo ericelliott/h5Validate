@@ -1,6 +1,6 @@
 /**
  * h5Validate
- * @version v0.3.1
+ * @version v0.3.2
  * Using semantic versioning: http://semver.org/
  * @author Eric Hamilton dilvie@dilvie.com
  * @copyright 2010 Eric Hamilton
@@ -118,7 +118,7 @@
 				// required to false if it doesn't exist. The more conformant version of this
 				// failed sanity checking in the browser environment. This plugin is meant to be
 				// practical, not ideologically married to the spec.
-				required = ($this.attr('required')) ? true : false,
+				required = ($this.filter('[required]')) ? true : false,
 				errorClass = settings.errorClass,
 				validClass = settings.validClass,
 				errorIDbare = $this.attr(settings.errorAttribute) || false, // Get the ID of the error element.
