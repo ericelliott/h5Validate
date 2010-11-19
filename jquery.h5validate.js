@@ -118,11 +118,11 @@
 				errorIDbare = $this.attr(settings.errorAttribute) || false, // Get the ID of the error element.
 				errorID = errorIDbare ? '#' + errorIDbare : false, // Add the hash for convenience. This is done in two steps to avoid two attribute lookups.
 				required = false,
-				$checkRequired = $('<input data-test="test" required>');
+				$checkRequired = $('<input required>');
 
 				/*	If the required attribute exists, set it required to true, unless it's set 'false'.
 				*	This is a minor deviation from the spec, but it seems some browsers have falsey 
-				*	required to false if the attribute is empty (should be true). The more conformant 
+				*	required values if the attribute is empty (should be true). The more conformant 
 				*	version of this failed sanity checking in the browser environment.
 				*	This plugin is meant to be practical, not ideologically married to the spec.
 				*/
