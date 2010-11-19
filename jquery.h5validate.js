@@ -1,6 +1,6 @@
 /**
  * h5Validate
- * @version v0.3.2
+ * @version v0.3.3
  * Using semantic versioning: http://semver.org/
  * @author Eric Hamilton dilvie@dilvie.com
  * @copyright 2010 Eric Hamilton
@@ -113,16 +113,26 @@
 				// "...as if it implied a ^(?: at the start of the pattern and a )$ at the end."
 				re = new RegExp('^(?:' + pattern + ')$'),
 				value = $this.val(),
-				// If the required attribute exists, set it required to true, unless it's falsey.
-				// This is a minor deviation from the spec, but it seems some browsers are setting 
-				// required to false if it doesn't exist. The more conformant version of this
-				// failed sanity checking in the browser environment. This plugin is meant to be
-				// practical, not ideologically married to the spec.
-				required = ($this.filter('[required]')) ? true : false,
 				errorClass = settings.errorClass,
 				validClass = settings.validClass,
 				errorIDbare = $this.attr(settings.errorAttribute) || false, // Get the ID of the error element.
-				errorID = errorIDbare ? '#' + errorIDbare : false; // Add the hash for convenience. This is done in two steps to avoid two attribute lookups.
+				errorID = errorIDbare ? '#' + errorIDbare : false, // Add the hash for convenience. This is done in two steps to avoid two attribute lookups.
+				required = false,
+				required2 = false,
+				$checkRequired = $('<input data-test="test" required>');
+
+				/*	If the required attribute exists, set it required to true, unless it's set 'false'.
+				*	This is a minor deviation from the spec, but it seems some browsers have falsey 
+				*	required to false if the attribute is empty (should be true). The more conformant 
+				*	version of this failed sanity checking in the browser environment.
+				*	This plugin is meant to be practical, not ideologically married to the spec.
+				*/
+				// Feature fork
+				if ($checkRequired.filter('[required]') && $checkRequired.filter('[required]').length) {
+					required = ($this.filter('[required]').length && $this.attr('required') !== 'false') ? true : false;
+				} else {
+					required = ($this.attr('required') !== undefined) ? true : false;
+				}
 
 				if (settings.debug && window.console) {
 					console.log('Validate called on "' + value + '" with regex "' + re + '". Required: ' + required); // **DEBUG

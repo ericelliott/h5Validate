@@ -3,7 +3,7 @@
 		<title>h5Validate - The HTML5 Form Validation Plugin for jQuery</title>
 		<script type="text/javascript" src="http://js.getexceptional.com/exceptional.js"></script>
 		<script type="text/javascript">
-		  Exceptional.setKey('f50f8996e48810131edb6fbefce210cb70e400e9');
+		  Exceptional.setKey('e778cbe66170d28dc9233629cec1edba8c98113a');
 		</script>
 		<style type="text/css">
 			body {
@@ -67,7 +67,17 @@
 .button:active {
    border-top-color: #1b435e;
    background: #1b435e;
-   }	
+   }
+.announce {
+	border-left: 1px solid #afafaf;
+	background-color: #ffefff;
+	color: black;
+	margin-left: 3em;
+	padding-top:.1em;
+	padding-bottom: .1em;
+	padding-left: 1em;
+	padding-right: 1em;
+}
 		</style>
 	</head>
 	<body>
@@ -76,12 +86,20 @@
 		<a class="button" href="http://github.com/dilvie/h5Validate/archives/master">Download from Github</a>
 
 		<br /><br />
-
+		
 		<p>If you want to contribute, feel free to <a href="http://github.com/dilvie/h5Validate">fork the project on Github</a>.</p>
 		
 		<p>A jQuery plugin that understands HTML5 forms and knows how to validate them, even in browsers that don't yet support HTML5.</p>
 
 		<p>In browsers that do support HTML5, h5Validate adds some much-needed features, such as the ability to customize the user interface when an input fails validation.</p>
+		
+		<div class="announce">
+			<p><h3>Important update: A known cross-browser issue was resolved in v0.3.3:</h3></p>
+			<p>The required attribute was not being handled properly in some (non-webkit) browsers, including IE and Firefox.</p>
+			<p>If you are using a version older than 0.3.3, an upgrade is highly recommended.</p>
+			<p>The fix was tested in IE 9, 8, 7, 6, Chrome, Firefox, Safari, and Opera. Tested on Windows 7 and Mac.</p>
+			<p>Many thanks to ajpiano on Freenode #jquery for helpful suggestions.</p>
+		</div>
 
 		<h2>Jump Start</h2>
 		
