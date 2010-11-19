@@ -118,7 +118,6 @@
 				errorIDbare = $this.attr(settings.errorAttribute) || false, // Get the ID of the error element.
 				errorID = errorIDbare ? '#' + errorIDbare : false, // Add the hash for convenience. This is done in two steps to avoid two attribute lookups.
 				required = false,
-				required2 = false,
 				$checkRequired = $('<input data-test="test" required>');
 
 				/*	If the required attribute exists, set it required to true, unless it's set 'false'.
