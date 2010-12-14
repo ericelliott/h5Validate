@@ -35,6 +35,17 @@
 				display:block;
 				margin:1em;
 			}
+			#form4 input, label {
+				float:left;
+			}
+			.message {
+				margin-left:1em;
+				width:20em;
+				border:1px;
+				padding:2px;
+				float:left;
+				font-size:10pt;
+			}
 			.black {
 				background-color:#111111;
 				color:silver;
@@ -112,7 +123,7 @@
 		
 		<h3>HTML5 required attribute. e.g.</h3>		
 
-		<form id="form1">
+		<form id="form1" class="h5-defaults">
 		<label for="name">Your Name:*</label>
 		<input id="name" name="name" type="text" placeholder="Bob" title="Your name is required." required />
 		<p><em>Hint: Select it, then click somewhere else without typing anything.</em></p>
@@ -124,11 +135,12 @@
 
 		<h3>HTMTL5 pattern attribute. e.g.</h3>
 
-		<form id="form2">
+		<form id="form2" class="h5-defaults">
 		<label for="birthdate">Your Birth Date:</label>
 		<input id="name" name="name" type="text" placeholder="mm/dd/yyyy" title="mm/dd/yyyy" pattern="(0[1-9]|1[012])[- /.](0[1-9]|[12][0-9]|3[01])[- /.](19|20)\d\d" />
-		<p><em>Hint: It's expecting mm/dd/yyyy. Try typing "jQuery rocks!" instead.</em></p>
 		</form>
+		<p><em>Hint: It's expecting mm/dd/yyyy. Try typing "jQuery rocks!" instead.</em></p>
+
 		
 		<h4>Source:</h4>
 		
@@ -139,6 +151,17 @@
 		<p>Sometimes, you'll want to re-use the same validation pattern for several elements on a page. You could copy and paste the same pattern over and over again to a bunch of different form fields, but what happens if you discover a bug in the pattern? Fix it and repeat the whole copy and paste process?</p>
 		
 		<p>A better solution is to attach the pattern with a class selector. Use <a href="#addPatterns"><code>$.h5Validate.addPatterns()</code></a> to add your pattern, make sure the classPrefix variable is set correctly (it's <code>h5-</code> by default), and add the class to the input fields.</p>
+		
+		<h3>Error Messages</h3>
+		
+		<p>Error divs should be hidden in the HTML with <code>display:none;</code> -- h5Validate shows them when the corresponding field is marked invalid.</p>
+
+		<form id="form4" class="h5-defaults">
+		<label for="FirstName">Your Name:*</label>
+		<input id="FirstName" type="text" data-h5-errorid="invalid-FirstName" title="Required: Please provide your first name." required />
+		<div id="invalid-FirstName" class="ui-state-error message" style="display:none;">Default error: Please enter your name.</div>
+		</form>
+		
 
 		<h2>Options</h2>
 				
@@ -156,8 +179,8 @@
 		<dl>
 		<dt>errorClass</dt><dd><p>Custom CSS class for validation errors.</p></dd>
 		<dt>validClass</dt><dd><p>Custom CSS class to mark a field validated.</p></dd>		
-		<dt>errorAttribute</dt><dd><p>An html attribute that stores the ID of the error message container for this element. It's set to data-errorID by default. <em>Note: The data- attribute prefix is a new feature of HTML5, used to store an element's meta-data.</em> e.g.</p>
-			<code class="block">&lt;input id="name" data-errorID="nameError" required &gt;</code>
+		<dt>errorAttribute</dt><dd><p>An html attribute that stores the ID of the error message container for this element. It's set to data-h5-errorid by default. <em>Note: The data- attribute prefix is a new feature of HTML5, used to store an element's meta-data.</em> e.g.</p>
+			<code class="block">&lt;input id="name" data-h5-errorid="nameError" required &gt;</code>
 		</dd>
 		<dt>kbSelectors</dt><dd><p>A list of CSS selectors for attaching keyboard-oriented events. Default:</p>
 			<code class="block">kbSelectors: ':text, :password, select, textarea'</code>
@@ -192,7 +215,7 @@
 				HTML5 compatible regular expressions.</p></dd></dl>
 
 		<h3>Demo</h3>		
-		<form id="form3">
+		<form id="form3" class="h5-defaults">
 		<label for="phone">Your Phone Number:</label>
 		<input class="h5-phone" id="phone" name="phone" type="text" placeholder="555-555-5555" title="555-555-5555" />
 		</form>
@@ -244,7 +267,7 @@
 			$.h5Validate.addPatterns({
 					phone: /([\+][0-9]{1,3}([ \.\-])?)?([\(]{1}[0-9]{3}[\)])?([0-9A-Z \.\-]{1,32})((x|ext|extension)?[0-9]{1,4}?)/				
 			});
-		    $('#form1, #form2, #form3').h5Validate();
+		    $('form.h5-defaults').h5Validate();
 			$('#black').h5Validate({
 				errorClass:'black'
 			});

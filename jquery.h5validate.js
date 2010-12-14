@@ -1,6 +1,6 @@
 /**
  * h5Validate
- * @version v0.3.3
+ * @version v0.3.4
  * Using semantic versioning: http://semver.org/
  * @author Eric Hamilton dilvie@dilvie.com
  * @copyright 2010 Eric Hamilton
@@ -49,7 +49,7 @@
 				classPrefix: 'h5-',
 
 				// Attribute which stores the ID of the error container element (without the hash).
-				errorAttribute: 'data-errorID',
+				errorAttribute: 'data-h5-errorid',
 
 				// Setup KB event delegation.
 				kbSelectors: ':text, :password, select, textarea',
@@ -70,12 +70,15 @@
 				// ** TODO: Highlight labels
 				// ** TODO: Implement setCustomValidity as per the spec:
 				// http://www.whatwg.org/specs/web-apps/current-work/multipage/association-of-controls-and-forms.html#dom-cva-setcustomvalidity
-				markInvalid: function (element, reason, errorClass, validClass, errorID) {
-					var $element = $(element),
-						$errorID = $(errorID);
-					$element.addClass(errorClass).removeClass(validClass);
-					$element.find("#" + element.id).addClass(errorClass);
+				markInvalid: function (options) { // element, reason, errorClass, validClass, errorID
+					var $element = $(options.element),
+						$errorID = $(options.errorID);
+					$element.addClass(options.errorClass).removeClass(options.validClass);
+					// $element.find("#" + options.element.id).addClass(options.errorClass);
 					if ($errorID) {
+						if ($element.attr('title')) {
+							$errorID.text($element.attr('title'));
+						}
 						$errorID.show();
 					}
 					return $element;
@@ -83,8 +86,12 @@
 
 				// Mark field valid.
 				markValid: function (element, errorClass, validClass, errorID) {
-					var $element = $(element);
+					var $element = $(element),
+						$errorID = $(errorID);
 					$element.addClass(validClass).removeClass(errorClass);
+					if ($errorID) {
+						$errorID.hide();
+					}
 					return $element;
 				},
 
@@ -139,9 +146,21 @@
 				}
 
 				if (required && !value) {
-					settings.markInvalid(this, 'required', errorClass, validClass, errorID);
+					settings.markInvalid({
+						element:this,
+						reason: 'required',
+						errorClass: errorClass,
+						validClass: validClass,
+						errorID: errorID
+					});
 				} else if (pattern && !re.test(value) && value) {
-					settings.markInvalid(this, 'pattern', errorClass, validClass, errorID);
+					settings.markInvalid({
+						element:this,
+						reason: 'pattern',
+						errorClass: errorClass,
+						validClass: validClass,
+						errorID: errorID
+					});
 				} else {
 					settings.markValid(this, errorClass, validClass, errorID);
 				}
@@ -222,7 +241,7 @@
 		 * @param {Object} patterns A map of pattern names and HTML5 compatible
 		 * regular expressions.
 		 * 
-		 * @returns {Object} this
+		 * @returns {Object} patternLibrary The modified pattern library
 		 */
 		addPatterns : function (patterns) {
 			var patternLibrary = defaults.patternLibrary,
@@ -235,7 +254,7 @@
 					}
 				}
 			}
-			return this;
+			return patternLibrary;
 		},
 		/**
 		 * Take a valid jQuery selector, and a list of valid values to
