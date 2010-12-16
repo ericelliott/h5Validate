@@ -1,12 +1,12 @@
 /**
  * h5Validate
- * @version v0.3.4
+ * @version v0.4.0
  * Using semantic versioning: http://semver.org/
  * @author Eric Hamilton dilvie@dilvie.com
  * @copyright 2010 Eric Hamilton
  * @license MIT http://www.opensource.org/licenses/mit-license.html
  * 
- * Developed under the sponsorship of Zumba.com and MyRentalToolbox
+ * Developed under the sponsorship of Zumba.com and Rese Property Management
  */
 
 /*global jQuery window */
@@ -42,11 +42,12 @@
 					invalid: 'Please correct this field.'
 				},
 
-				errorClass: 'ui-state-error',
-				validClass: 'ui-state-valid',
-
-				// The prefix to use to trigger pattern-library validation.
+				// The prefix to use for dynamically-created class names.
 				classPrefix: 'h5-',
+
+				errorClass: 'ui-state-error', // No prefix for these.
+				validClass: 'ui-state-valid', // "
+				activeClass: 'active', // Prefix will get prepended.
 
 				// Attribute which stores the ID of the error container element (without the hash).
 				errorAttribute: 'data-h5-errorid',
@@ -55,12 +56,14 @@
 				kbSelectors: ':text, :password, select, textarea',
 				focusout: true,
 				focusin: false,
-				change: false,
-				keyup: true,
+				change: true,
+				keyup: false,
 
 				// Setup mouse event delegation.
 				mSelectors: ':radio, :checkbox, select, option',
 				click: true,
+				
+				activeKeyup: true,
 
 				// Validate on submit?
 				// **TODO: This isn't implemented, yet.
@@ -74,7 +77,10 @@
 					var $element = $(options.element),
 						$errorID = $(options.errorID);
 					$element.addClass(options.errorClass).removeClass(options.validClass);
-					// $element.find("#" + options.element.id).addClass(options.errorClass);
+
+					// User needs help. Enable active validation.
+					$element.addClass(options.settings.activeClass);
+
 					if ($errorID) {
 						if ($element.attr('title')) {
 							$errorID.text($element.attr('title'));
@@ -88,6 +94,7 @@
 				markValid: function (element, errorClass, validClass, errorID) {
 					var $element = $(element),
 						$errorID = $(errorID);
+
 					$element.addClass(validClass).removeClass(errorClass);
 					if ($errorID) {
 						$errorID.hide();
@@ -125,6 +132,8 @@
 				errorIDbare = $this.attr(settings.errorAttribute) || false, // Get the ID of the error element.
 				errorID = errorIDbare ? '#' + errorIDbare : false, // Add the hash for convenience. This is done in two steps to avoid two attribute lookups.
 				required = false,
+				isValid = true,
+				reason = '',
 				$checkRequired = $('<input required>');
 
 				/*	If the required attribute exists, set it required to true, unless it's set 'false'.
@@ -146,23 +155,25 @@
 				}
 
 				if (required && !value) {
-					settings.markInvalid({
-						element:this,
-						reason: 'required',
-						errorClass: errorClass,
-						validClass: validClass,
-						errorID: errorID
-					});
+					isValid = false;
+					reason = 'required';
 				} else if (pattern && !re.test(value) && value) {
+					isValid = false;
+					reason = 'pattern';
+				} else {
+					isValid = true;
+					settings.markValid(this, errorClass, validClass, errorID);
+				}
+
+				if (!isValid) {
 					settings.markInvalid({
-						element:this,
-						reason: 'pattern',
+						element: this,
+						reason: reason,
 						errorClass: errorClass,
 						validClass: validClass,
-						errorID: errorID
+						errorID: errorID,
+						settings: settings
 					});
-				} else {
-					settings.markValid(this, errorClass, validClass, errorID);
 				}
 			},
 
@@ -223,10 +234,14 @@
 						},
 						mEvents = {
 							click: settings.click
+						},
+						activeEvents = {
+							keyup:settings.activeKeyup
 						};
 
 					methods.delegateEvents(settings.kbSelectors, kbEvents, this, settings);
 					methods.delegateEvents(settings.mSelectors, mEvents, this, settings);
+					methods.delegateEvents(settings.activeClassSelector, activeEvents, this, settings);
 				});
 			}
 		};
@@ -280,7 +295,14 @@
 
 	$.fn.h5Validate = function (options) {
 		// Combine defaults and options to get current settings.
-		var settings = $.extend({}, defaults, options);
+		var settings = $.extend({}, defaults, options),
+			activeClass = settings.classPrefix + settings.activeClass;
+
+		$.extend(settings, {
+			activeClass: activeClass,
+			activeClassSelector: '.' + activeClass 
+		});
+
 		settings.messages = messages;
 
 		// Expose public API.
