@@ -4,9 +4,11 @@
  * Using semantic versioning: http://semver.org/
  * @author Eric Hamilton dilvie@dilvie.com
  * @copyright 2010 Eric Hamilton
- * @license MIT http://www.opensource.org/licenses/mit-license.html
- * 
- * Developed under the sponsorship of Zumba.com and Rese Property Management
+ * Dual licensed under the MIT and GPL licenses:
+ * http://www.opensource.org/licenses/mit-license.php
+ * http://www.gnu.org/licenses/gpl.html
+ *
+ * Developed under the sponsorship of Zumba Fitness, LLC, and Rese Property Management
  */
 
 /*global jQuery window */
@@ -71,9 +73,10 @@
 
 				// Mark field invalid.
 				// ** TODO: Highlight labels
+				// **TODO: Simplify function signature: element, reason, settings -- was element, reason, errorClass, validClass, errorID, settings
 				// ** TODO: Implement setCustomValidity as per the spec:
 				// http://www.whatwg.org/specs/web-apps/current-work/multipage/association-of-controls-and-forms.html#dom-cva-setcustomvalidity
-				markInvalid: function (options) { // element, reason, errorClass, validClass, errorID
+				markInvalid: function (options) { 
 					var $element = $(options.element),
 						$errorID = $(options.errorID);
 					$element.addClass(options.errorClass).removeClass(options.validClass);
@@ -81,7 +84,7 @@
 					// User needs help. Enable active validation.
 					$element.addClass(options.settings.activeClass);
 
-					if ($errorID) {
+					if ($errorID.length) { // These ifs are technically not needed, but improve server-side performance 
 						if ($element.attr('title')) {
 							$errorID.text($element.attr('title'));
 						}
@@ -91,18 +94,20 @@
 		        },
 
 				// Mark field valid.
+				// **TODO: Simplify function signature: element, reason, settings -- was element, reason, errorClass, validClass, errorID, settings
 				markValid: function (element, errorClass, validClass, errorID) {
 					var $element = $(element),
 						$errorID = $(errorID);
 
 					$element.addClass(validClass).removeClass(errorClass);
-					if ($errorID) {
+					if ($errorID.length) {
 						$errorID.hide();
 					}
 					return $element;
 				},
 
 				// Unmark field
+				// **TODO: Simplify function signature: element, settings -- was element, reason, errorClass, validClass, errorID, settings
 				unmark: function (element, errorClass, validClass, errorID) {
 					var $element = $(element);
 					$element.removeClass(errorClass).removeClass(validClass);
