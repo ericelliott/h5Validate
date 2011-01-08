@@ -92,6 +92,7 @@
 		</style>
 	</head>
 	<body>
+		<header>
 		<h1>h5Validate - HTML5 Form Validation for jQuery</h1>
 
 		<a class="button" href="http://github.com/dilvie/h5Validate/archives/master">Download from Github</a>
@@ -99,11 +100,15 @@
 		<br /><br />
 		
 		<p>If you want to contribute, feel free to <a href="http://github.com/dilvie/h5Validate">fork the project on Github</a>.</p>
-		
-		<p>A jQuery plugin that understands HTML5 forms and knows how to validate them, even in browsers that don't yet support HTML5.</p>
 
-		<p>In browsers that do support HTML5, h5Validate adds some much-needed features, such as the ability to customize the user interface when an input fails validation.</p>
-		
+		<p>Best practice realtime HTML5 form validation for jQuery. Works on all popular browsers, including old ones like IE6.</p>
+
+		<ul>
+			<li>Regularly tested on 13 different browsers, IE6 - IE9, FireFox, Chrome, iPhone, and Android.</li>
+			<li>Implements best practices based on 1,000 user survey, several usability studies, and the behavior of millions of users in live production environments.</li>
+		</ul>
+		</header>
+
 		<div class="announce">
 			<p><h3>Important update: A known cross-browser issue was resolved in v0.3.3:</h3></p>
 			<p>The required attribute was not being handled properly in some (non-webkit) browsers, including IE and Firefox.</p>
@@ -114,13 +119,13 @@
 		</div>
 
 		<h2>Jump Start</h2>
-		
+
 		<p>Copy and paste this at the end of the body on any page with an HTML5 form. If html5 validation rules exist in the form, you're in business!</p>
 
 		<script src="http://gist.github.com/607687.js?file=h5Validate-loader-part.html"></script>
 
 		<h2>Features</h2>
-		
+
 		<h3>HTML5 required attribute. e.g.</h3>		
 
 		<form id="form1" class="h5-defaults">
