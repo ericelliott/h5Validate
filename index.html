@@ -172,6 +172,14 @@
 		
 		<p>A better solution is to attach the pattern with a class selector. Use <a href="#addPatterns"><code>$.h5Validate.addPatterns()</code></a> to add your pattern, make sure the classPrefix variable is set correctly (it's <code>h5-</code> by default), and add the class to the input fields.</p>
 		
+		<form class="h5-defaults">
+			<label for="email">Email:</label>
+			<input type="text" class="h5-email" required />
+		</form>
+		
+		<h4>Source:</h4>
+		<script src="https://gist.github.com/814972.js?file=gistfile1.phtml"></script>
+		
 		<h3>Error Messages</h3>
 		
 		<p>Error divs should be hidden in the HTML with <code>display:none;</code> -- h5Validate shows them when the corresponding field is marked invalid.</p>
