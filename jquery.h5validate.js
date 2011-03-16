@@ -1,6 +1,6 @@
 /**
  * h5Validate
- * @version v0.4.0
+ * @version v0.5.0
  * Using semantic versioning: http://semver.org/
  * @author Eric Hamilton dilvie@dilvie.com
  * @copyright 2010 Eric Hamilton
@@ -16,11 +16,11 @@
 (function ($) {
 	var h5 = { // Public API
 			defaults : {
-				debug: true,
+				debug: false,
 
 				// HTML5-compatible validation pattern library that can be extended and/or overriden.
 				patternLibrary : { //** TODO: Test the new regex patterns. Should I apply these to the new input types?
-					// **TODO: url, password
+					// **TODO: password
 					phone: /([\+][0-9]{1,3}([ \.\-])?)?([\(]{1}[0-9]{3}[\)])?([0-9A-Z \.\-]{1,32})((x|ext|extension)?[0-9]{1,4}?)/,
 
 					// Shamelessly lifted from Scott Gonzalez via the Bassistance Validation plugin http://projects.scottsplayground.com/email_address_validation/
@@ -50,6 +50,9 @@
 				errorClass: 'ui-state-error', // No prefix for these.
 				validClass: 'ui-state-valid', // "
 				activeClass: 'active', // Prefix will get prepended.
+				requiredClass: 'required',
+				requiredAttribute: 'required',
+				patternAttribute: 'pattern',
 
 				// Attribute which stores the ID of the error container element (without the hash).
 				errorAttribute: 'data-h5-errorid',
@@ -67,13 +70,19 @@
 				
 				activeKeyup: true,
 
+				// What do we name the required .data variable?
+				requiredVar: 'h5-required',
+				
+				// What do we name the pattern .data variable?
+				patternVar: 'h5-pattern',
+				stripMarkup: true,
+
 				// Validate on submit?
 				// **TODO: This isn't implemented, yet.
 				submit: true,
 
 				// Mark field invalid.
 				// ** TODO: Highlight labels
-				// **TODO: Simplify function signature: element, reason, settings -- was element, reason, errorClass, validClass, errorID, settings
 				// ** TODO: Implement setCustomValidity as per the spec:
 				// http://www.whatwg.org/specs/web-apps/current-work/multipage/association-of-controls-and-forms.html#dom-cva-setcustomvalidity
 				markInvalid: function (options) { 
@@ -94,12 +103,11 @@
 		        },
 
 				// Mark field valid.
-				// **TODO: Simplify function signature: element, reason, settings -- was element, reason, errorClass, validClass, errorID, settings
-				markValid: function (element, errorClass, validClass, errorID) {
-					var $element = $(element),
-						$errorID = $(errorID);
+				markValid: function (options) {
+					var $element = $(options.element),
+						$errorID = $(options.errorID);
 
-					$element.addClass(validClass).removeClass(errorClass);
+					$element.addClass(options.validClass).removeClass(options.errorClass);
 					if ($errorID.length) {
 						$errorID.hide();
 					}
@@ -107,11 +115,10 @@
 				},
 
 				// Unmark field
-				// **TODO: Simplify function signature: element, settings -- was element, reason, errorClass, validClass, errorID, settings
-				unmark: function (element, errorClass, validClass, errorID) {
-					var $element = $(element);
-					$element.removeClass(errorClass).removeClass(validClass);
-					$element.form.find("#" + element.id).removeClass(errorClass).removeClass(validClass);
+				unmark: function (options) {
+					var $element = $(options.element);
+					$element.removeClass(options.errorClass).removeClass(options.validClass);
+					$element.form.find("#" + options.element.id).removeClass(options.errorClass).removeClass(options.validClass);
 					return $element;
 				}	
 			}
@@ -123,51 +130,38 @@
 
 		methods = {
 			validate: function (settings) {
-				// Get the HTML5 pattern attribute if it exists.
-				// ** TODO: If a pattern class exists, grab the pattern from the patternLibrary, but the pattern attrib should override that value.
 				var $this = $(this),
-					pattern = $this.filter('[pattern]')[0] ? $this.attr('pattern') : false,
-
-				// The pattern attribute must match the whole value, not just a subset:
-				// "...as if it implied a ^(?: at the start of the pattern and a )$ at the end."
-				re = new RegExp('^(?:' + pattern + ')$'),
+				re = $this.data(settings.patternVar),
 				value = $this.val(),
 				errorClass = settings.errorClass,
 				validClass = settings.validClass,
 				errorIDbare = $this.attr(settings.errorAttribute) || false, // Get the ID of the error element.
 				errorID = errorIDbare ? '#' + errorIDbare : false, // Add the hash for convenience. This is done in two steps to avoid two attribute lookups.
-				required = false,
+				required = $this.data(settings.requiredVar),
 				isValid = true,
-				reason = '',
-				$checkRequired = $('<input required>');
-
-				/*	If the required attribute exists, set it required to true, unless it's set 'false'.
-				*	This is a minor deviation from the spec, but it seems some browsers have falsey 
-				*	required values if the attribute is empty (should be true). The more conformant 
-				*	version of this failed sanity checking in the browser environment.
-				*	This plugin is meant to be practical, not ideologically married to the spec.
-				*/
-				// Feature fork
-				if ($checkRequired.filter('[required]') && $checkRequired.filter('[required]').length) {
-					required = ($this.filter('[required]').length && $this.attr('required') !== 'false') ? true : false;
-				} else {
-					required = ($this.attr('required') !== undefined) ? true : false;
-				}
+				reason = '';
 
 				if (settings.debug && window.console) {
 					console.log('Validate called on "' + value + '" with regex "' + re + '". Required: ' + required); // **DEBUG
-					console.log('Regex test: ' + re.test(value) + ', Pattern: ' + pattern); // **DEBUG
+					if (re) {
+						console.log('Regex test: ' + re.test(value) + ', Regex: ' + re); // **DEBUG
+					}
 				}
 
 				if (required && !value) {
 					isValid = false;
 					reason = 'required';
-				} else if (pattern && !re.test(value) && value) {
+				} else if (re && !re.test(value) && value) {
 					isValid = false;
 					reason = 'pattern';
 				} else {
 					isValid = true;
-					settings.markValid(this, errorClass, validClass, errorID);
+					settings.markValid({
+						element: this,
+						errorClass: errorClass, 
+						validClass: validClass, 
+						errorID: errorID
+					});
 				}
 
 				if (!isValid) {
@@ -194,7 +188,7 @@
 				var events = [],
 					key = 0,
 					validate = function () {
-						methods.validate.call(this, settings);
+						settings.validate.call(this, settings);
 					};
 				$.each(eventFlags, function (key, value) {
 					if (value) {
@@ -204,9 +198,6 @@
 				key=0;
 				for (key in events) {
 					if (events.hasOwnProperty(key)) {
-						if (settings.debug && window.console) {
-							console.log(events[key] + ', ' + selectors); //**DEBUG
-						}
 						$(element).delegate(selectors, events[key] + '.h5Validate', validate);
 					}
 				}
@@ -223,12 +214,12 @@
 			bindDelegation: function (settings) {
 				// Attach patterns from the library to elements.
 				$.each(patternLibrary, function (key, value) {
-					var pattern = value.toString();
+					// ** TODO: Inline patterns should take precedence over the patternLibrary.
+					var pattern = value.toString(),
+						re;
 					pattern = pattern.substring(1, pattern.length-1);
-					if (settings.debug && window.console) {
-						console.log('.' + settings.classPrefix + key + ' : ' + pattern);
-					}
-					$('.' + settings.classPrefix + key).attr('pattern', pattern);
+					re = new RegExp('^(?:' + pattern + ')$');
+					$('.' + settings.classPrefix + key).data(settings.patternVar, re);
 				});
 				return this.each(function () {
 					var kbEvents = {
@@ -244,9 +235,9 @@
 							keyup:settings.activeKeyup
 						};
 
-					methods.delegateEvents(settings.kbSelectors, kbEvents, this, settings);
-					methods.delegateEvents(settings.mSelectors, mEvents, this, settings);
-					methods.delegateEvents(settings.activeClassSelector, activeEvents, this, settings);
+					settings.delegateEvents(settings.kbSelectors, kbEvents, this, settings);
+					settings.delegateEvents(settings.mSelectors, mEvents, this, settings);
+					settings.delegateEvents(settings.activeClassSelector, activeEvents, this, settings);
 				});
 			}
 		};
@@ -263,15 +254,12 @@
 		 * 
 		 * @returns {Object} patternLibrary The modified pattern library
 		 */
-		addPatterns : function (patterns) {
+		addPatterns: function (patterns) {
 			var patternLibrary = defaults.patternLibrary,
 				key;
 			for (key in patterns) {
 				if (patterns.hasOwnProperty(key)) {
 					patternLibrary[key] = patterns[key];
-					if (defaults.debug && window.console) {
-						console.log(patternLibrary[key]);
-					}
 				}
 			}
 			return patternLibrary;
@@ -286,32 +274,78 @@
 		 * @param {Array} values A list of valid values to validate selected 
 		 * fields against.
 		 */
-		validValues : function (selector, values) {
+		validValues: function (selector, values) {
 			var i = 0,
 				ln = values.length,
-				pattern = '';
+				pattern = '',
+				re;
 			// Build regex pattern
 			for (i = 0; i < ln; i++) {
 				pattern = pattern ? pattern + '|' + values[i] : values[i];
 			}
-			$(selector).attr('pattern', pattern);
+			re = new RegExp('^(?:' + pattern + ')$');
+			$(selector).data('regex', re);
+		},
+		getRules: function (options) {
+			var $checkRequired = $('<input required>').filter('[required]'),
+				$container = (options.container) ? $(options.container) : $(this),
+				requiredAttribute = options.requiredAttribute,
+				patternAttribute = options.patternAttribute;
+
+			$container.find('input, textarea, select').each(function () {
+				var $this = $(this),
+					required;
+
+				if ($checkRequired && $checkRequired.length) {
+					required = !!($this.filter('[' + requiredAttribute + ']').length && $this.attr(requiredAttribute) !== 'false');
+				} else {
+					required = !!($this.attr(requiredAttribute) !== undefined);
+				}
+
+				if ((required || required === false) && !$this.data(options.requiredVar)) {
+					$this.addClass(options.requiredClass).data(options.requiredVar, required);
+				}
+
+				$this.filter('[' + patternAttribute + ']').each(function () {
+					var $this = $(this),
+						pattern = $this.attr(patternAttribute),
+						// The pattern attribute must match the whole value, not just a subset:
+						// "...as if it implied a ^(?: at the start of the pattern and a )$ at the end."
+						re = new RegExp('^(?:' + pattern + ')$');
+
+					if (pattern && !$this.data(options.patternVar)) {
+						$this.data(options.patternVar, re);
+					}
+					return $this;
+				});
+
+				if (options.stripMarkup) {
+					$this.removeAttr(patternAttribute).removeAttr(requiredAttribute);
+				}
+
+				return $this;
+			});
 		}
 	};
 
 	$.fn.h5Validate = function (options) {
 		// Combine defaults and options to get current settings.
-		var settings = $.extend({}, defaults, options),
+		var settings = $.extend({}, defaults, options, methods),
 			activeClass = settings.classPrefix + settings.activeClass;
 
 		$.extend(settings, {
 			activeClass: activeClass,
-			activeClassSelector: '.' + activeClass 
+			activeClassSelector: '.' + activeClass,
+			requiredClass: settings.classPrefix + settings.requiredClass
 		});
 
 		settings.messages = messages;
 
 		// Expose public API.
 		$.extend($.fn.h5Validate, h5);
+
+		// Override defaults
+		$.h5Validate.getRules.call(this, settings);
 
 		// Returning the jQuery object allows for method chaining.
 		return methods.bindDelegation.call(this, settings);

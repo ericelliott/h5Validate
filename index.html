@@ -1,10 +1,12 @@
 <!DOCTYPE html>
 	<head>
 		<title>h5Validate - The HTML5 Form Validation Plugin for jQuery</title>
-		<script type="text/javascript" src="http://js.getexceptional.com/exceptional.js"></script>
+<!-- 	
+		<script type="text/javascript" src="http://js.getexceptional.com/exceptional.js"></script> 
 		<script type="text/javascript">
 		  Exceptional.setKey('e778cbe66170d28dc9233629cec1edba8c98113a');
 		</script>
+-->
 		<style type="text/css">
 			body {
 				width:960px;
@@ -147,6 +149,7 @@
 		<label for="name">Your Name:*</label>
 		<input id="name" name="name" type="text" placeholder="Bob" title="Your name is required." required />
 		<p><em>Hint: Select it, then click somewhere else without typing anything.</em></p>
+		<button type="submit">Submit</button>
 		</form>
 
 		<h4>Source:</h4>
@@ -157,7 +160,7 @@
 
 		<form id="form2" class="h5-defaults">
 		<label for="birthdate">Your Birth Date:</label>
-		<input id="name" name="name" type="text" placeholder="mm/dd/yyyy" title="mm/dd/yyyy" pattern="(0[1-9]|1[012])[- /.](0[1-9]|[12][0-9]|3[01])[- /.](19|20)\d\d" />
+		<input id="birthdate" name="name" type="text" placeholder="mm/dd/yyyy" title="mm/dd/yyyy" pattern="(0[1-9]|1[012])[- /.](0[1-9]|[12][0-9]|3[01])[- /.](19|20)\d\d" />
 		</form>
 		<p><em>Hint: It's expecting mm/dd/yyyy. Try typing "jQuery rocks!" instead.</em></p>
 
