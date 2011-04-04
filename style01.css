@@ -1,0 +1,192 @@
+body {
+	width:960px;
+	margin:0 auto 20px auto;
+	font: 13pt "Helvetica Neue", Arial, Helvetica, Geneva, sans-serif;
+	color: #4d4d4d;
+	background: #e5e5e5 url(img/background.png) repeat-y center top;
+}
+label {
+	font-weight:bold;
+	margin-right:1em;
+}
+h1, h2, h3, h4, h5 {
+	color: #000;
+	font-weight: 400;
+	letter-spacing: 0;
+}
+h1 {
+	font-size: 2.2em;
+	font-weight: 700;
+	text-align: center;
+	background: #eeeeee;
+	margin: 5px 0 9px;
+	padding: 15px;
+	/* Mozilla/Gecko (Firefox etc) */
+	-moz-box-shadow: 2px 2px 3px #555555;
+	/* WebKit (Safari, Google Chrome etc) */
+	-webkit-box-shadow: 2px 2px 3px #555555;
+	/* Opera 10.5, but will become the default standard in future versions of all browsers */
+	box-shadow: 2px 2px 3px #555555;
+	/* IE 8 */
+	-ms-filter: "progid:DXImageTransform.Microsoft.Shadow(Strength=2, Direction=135, Color='#555555')";
+	/* IE 5.5 - 7 */
+	filter: progid:DXImageTransform.Microsoft.Shadow(Strength=2, Direction=135, Color='#555555');
+		/* WebKit (Safari, Google Chrome etc) */
+	background: -webkit-gradient(linear, left top, left bottom, from(#dddddd), to(#888888));
+	/* Mozilla/Gecko (Firefox etc) */
+	background: -moz-linear-gradient(top, #dddddd, #888888);
+	/* IE 5.5 - 7 */
+	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr=#dddddd, endColorstr=#888888);
+	/* IE 8 */
+	-ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#dddddd, endColorstr=#888888)";
+	-webkit-border-radius: 10px;
+  	-moz-border-radius: 10px;
+	text-shadow: #fffeff 0 1px 1px;
+	color: #2c2c2c;
+}
+h2 {
+	font-size:2em;
+	margin: 50px 0 20px 0;
+	padding:5px 10px;
+		/* Mozilla/Gecko (Firefox etc) */
+	-moz-box-shadow: 1px 1px 3px #999999;
+	/* WebKit (Safari, Google Chrome etc) */
+	-webkit-box-shadow: 1px 1px 3px #999999;
+	/* Opera 10.5, but will become the default standard in future versions of all browsers */
+	box-shadow: 1px 1px 3px #999999;
+	/* IE 8 */
+	-ms-filter: "progid:DXImageTransform.Microsoft.Shadow(Strength=2, Direction=135, Color='#999999')";
+	/* IE 5.5 - 7 */
+	filter: progid:DXImageTransform.Microsoft.Shadow(Strength=2, Direction=135, Color='#999999');
+		/* WebKit (Safari, Google Chrome etc) */
+	background: -webkit-gradient(linear, left top, left bottom, from(#747474), to(#515151));
+	/* Mozilla/Gecko (Firefox etc) */
+	background: -moz-linear-gradient(top, #747474, #515151);
+	/* IE 5.5 - 7 */
+	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr=#747474, endColorstr=#515151);
+	/* IE 8 */
+	-ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#747474, endColorstr=#515151)";
+	-webkit-border-radius: 6px;
+  	-moz-border-radius: 6px;
+	text-shadow: #000000 0 1px 1px;
+	color: #fffeff;
+}
+h3 {
+	font-size:1.3em;
+	margin: 25px 10px 20px 10px;
+}
+h4 {
+	font-size:1.1em;
+	margin: 10px;
+}
+label {
+	font-weight: 400;
+	margin-left: 10px;
+	line-height: 29px;
+	margin-right: 5px;
+}
+input {
+	font-size: 13pt;
+	padding: 0;
+}
+p {
+	margin: 10px;
+}
+a {
+	color: #28597a;
+}
+ul {
+	margin: 20px 0;
+	padding: 0 30px;
+	list-style-position: outside;
+	list-style-type: circle;
+}
+dl {
+	margin: 10px;
+}
+dt {
+	font-weight:bold;
+	font-family:monospace;
+	line-height:100%;
+}
+.ui-state-error {
+	background-color:#BB1100;
+	color:white;
+}
+.block {
+	display:block;
+	margin:1em;
+}
+#form4 input, label {
+	float:left;
+}
+.message {
+	margin-left:1em;
+	width:20em;
+	border:1px;
+	padding:2px;
+	float:left;
+	font-size:10pt;
+}
+.black {
+	background-color:#111111;
+	color:silver;
+}
+.button {
+   border-top: 1px solid #96d1f8;
+   background: #65a9d7;
+   background: -webkit-gradient(linear, left top, left bottom, from(#3e779d), to(#65a9d7));
+   background: -moz-linear-gradient(top, #3e779d, #65a9d7);
+   padding: 13.5px 27px;
+   -webkit-border-radius: 17px;
+   -moz-border-radius: 17px;
+   border-radius: 17px;
+	/* Mozilla/Gecko (Firefox etc) */
+	-moz-box-shadow: 2px 2px 6px #555555;
+	/* WebKit (Safari, Google Chrome etc) */
+	-webkit-box-shadow: 2px 2px 6px #555555;
+	/* Opera 10.5, but will become the default standard in future versions of all browsers */
+	box-shadow: 2px 2px 6px #555555;
+	/* IE 8 */
+	-ms-filter: "progid:DXImageTransform.Microsoft.Shadow(Strength=2, Direction=135, Color='#555555')";
+	/* IE 5.5 - 7 */
+	filter: progid:DXImageTransform.Microsoft.Shadow(Strength=2, Direction=135, Color='#555555');
+
+   text-shadow: rgba(0,0,0,.4) 0 1px 0;
+   color: white;
+   font-size: 24px;
+   font-family: 'Lucida Grande', Helvetica, Arial, Sans-Serif;
+   text-decoration: none;
+   vertical-align: middle;
+	margin-left: 1em;
+	margin-top: 0;
+}
+.button:hover {
+   border-top-color: #28597a;
+   background: #28597a;
+   color: #ccc;
+   }
+.button:active {
+   border-top-color: #1b435e;
+   background: #1b435e;
+   }
+.announce {
+	border-top: 1px solid #afafaf;
+	border-left: 1px solid #afafaf;
+	background-color: #ffefff;
+	color: black;
+	margin: 0 10px;
+		/* Mozilla/Gecko (Firefox etc) */
+	-moz-box-shadow: 2px 2px 3px #999999;
+	/* WebKit (Safari, Google Chrome etc) */
+	-webkit-box-shadow: 2px 2px 3px #999999;
+	/* Opera 10.5, but will become the default standard in future versions of all browsers */
+	box-shadow: 2px 2px 3px #999999;
+	/* IE 8 */
+	-ms-filter: "progid:DXImageTransform.Microsoft.Shadow(Strength=2, Direction=135, Color='#999999')";
+	/* IE 5.5 - 7 */
+	filter: progid:DXImageTransform.Microsoft.Shadow(Strength=2, Direction=135, Color='#999999');
+	-webkit-border-radius: 6px;
+  	-moz-border-radius: 6px;
+	padding: 1em;
+}

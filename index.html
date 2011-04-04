@@ -7,91 +7,9 @@
 		  Exceptional.setKey('e778cbe66170d28dc9233629cec1edba8c98113a');
 		</script>
 -->
-		<style type="text/css">
-			body {
-				width:960px;
-				margin:0 auto;
-				font-size:14pt;
-			}
-			label {
-				font-weight:bold;
-				margin-right:1em;
-			}
-			h1 {
-				font-size: 2.5em;
-			}
-			h2 {
-				font-size:2em;
-				margin-top:2em;
-			}
-			dt {
-				font-weight:bold;
-				font-family:monospace;
-				line-height:100%;
-			}
-			.ui-state-error {
-				background-color:#BB1100;
-				color:white;
-			}
-			.block {
-				display:block;
-				margin:1em;
-			}
-			#form4 input, label {
-				float:left;
-			}
-			.message {
-				margin-left:1em;
-				width:20em;
-				border:1px;
-				padding:2px;
-				float:left;
-				font-size:10pt;
-			}
-			.black {
-				background-color:#111111;
-				color:silver;
-			}
-.button {
-   border-top: 1px solid #96d1f8;
-   background: #65a9d7;
-   background: -webkit-gradient(linear, left top, left bottom, from(#3e779d), to(#65a9d7));
-   background: -moz-linear-gradient(top, #3e779d, #65a9d7);
-   padding: 13.5px 27px;
-   -webkit-border-radius: 17px;
-   -moz-border-radius: 17px;
-   border-radius: 17px;
-   -webkit-box-shadow: rgba(0,0,0,1) 0 1px 0;
-   -moz-box-shadow: rgba(0,0,0,1) 0 1px 0;
-   box-shadow: rgba(0,0,0,1) 0 1px 0;
-   text-shadow: rgba(0,0,0,.4) 0 1px 0;
-   color: white;
-   font-size: 24px;
-   font-family: 'Lucida Grande', Helvetica, Arial, Sans-Serif;
-   text-decoration: none;
-   vertical-align: middle;
-   margin-bottom:2em;
-   }
-.button:hover {
-   border-top-color: #28597a;
-   background: #28597a;
-   color: #ccc;
-   }
-.button:active {
-   border-top-color: #1b435e;
-   background: #1b435e;
-   }
-.announce {
-	border-left: 1px solid #afafaf;
-	background-color: #ffefff;
-	color: black;
-	margin-left: 3em;
-	padding-top:.1em;
-	padding-bottom: .1em;
-	padding-left: 1em;
-	padding-right: 1em;
-}
-		</style>
+
+		<link href="style01.css" media="screen" rel="stylesheet" type="text/css" />
+
 		<script type="text/javascript">
 
 		  var _gaq = _gaq || [];
@@ -121,18 +39,17 @@
 		<p>Best practice realtime HTML5 form validation for jQuery. Works on all popular browsers, including old ones like IE6.</p>
 
 		<ul>
-			<li>Regularly tested on 13 different browsers, IE6 - IE9, FireFox, Chrome, iPhone, and Android.</li>
-			<li>Implements best practices based on 1,000 user survey, several usability studies, and the behavior of millions of users in live production environments.</li>
+			<li><p>Regularly tested on 13 different browsers, IE6 - IE9, FireFox, Chrome, iPhone, and Android.</p></li>
+			<li><p>Implements best practices based on 1,000 user survey, several usability studies, and the behavior of millions of users in live production environments.</p></li>
 		</ul>
 		</header>
 
 		<div class="announce">
-			<p><h3>Important update: A known cross-browser issue was resolved in v0.3.3:</h3></p>
-			<p>The required attribute was not being handled properly in some (non-webkit) browsers, including IE and Firefox.</p>
-			<p>If you are using a version older than 0.3.3, an upgrade is highly recommended.</p>
-			<p><strong>Verified support:</strong> IE 9, 8, 7, 6, Chrome, Firefox, Safari, and Opera. Tested on Windows 7 and Mac.</p>
-			<p><strong>Verified mobile support:</strong> iPhone, Android, Palm WebOS</p>
-			<p>Many thanks to ajpiano on Freenode #jquery for helpful suggestions.</p>
+			<h3>Supported Platforms</h3>
+			<p><strong>Desktop:</strong> IE 9, 8, 7, 6, Chrome, Firefox, Safari, and Opera. Tested on Windows 7 and Mac.</p>
+			<p><strong>Mobile:</strong> iPhone, Android, Palm WebOS</p>
+			<h3>New in v0.5.2+</h3>
+			<ul><li>Override native browser behavior.</li></ul>
 		</div>
 
 		<h2>Jump Start</h2>
@@ -149,7 +66,7 @@
 		<label for="name">Your Name:*</label>
 		<input id="name" name="name" type="text" placeholder="Bob" title="Your name is required." required />
 		<p><em>Hint: Select it, then click somewhere else without typing anything.</em></p>
-		<button type="submit">Submit</button>
+		<input type="submit" value="Submit" />
 		</form>
 
 		<h4>Source:</h4>

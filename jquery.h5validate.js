@@ -1,6 +1,6 @@
 /**
  * h5Validate
- * @version v0.5.0
+ * @version v0.5.2
  * Using semantic versioning: http://semver.org/
  * @author Eric Hamilton dilvie@dilvie.com
  * @copyright 2010 Eric Hamilton
@@ -34,7 +34,7 @@
 
 					// Date in ISO format. Credit: bassistance
 					dateISO: /\d{4}[\/\-]\d{1,2}[\/\-]\d{1,2}/,
-					
+
 					alpha: /[a-zA-Z]+/,
 					alphaNumeric: /\w+/,
 					integer: /-?\d+/
@@ -67,7 +67,7 @@
 				// Setup mouse event delegation.
 				mSelectors: ':radio, :checkbox, select, option',
 				click: true,
-				
+
 				activeKeyup: true,
 
 				// What do we name the required .data variable?
@@ -130,38 +130,58 @@
 
 		methods = {
 			validate: function (settings) {
+				// Get the HTML5 pattern attribute if it exists.
+				// ** TODO: If a pattern class exists, grab the pattern from the patternLibrary, but the pattern attrib should override that value.
 				var $this = $(this),
-				re = $this.data(settings.patternVar),
+					pattern = $this.filter('[pattern]')[0] ? $this.attr('pattern') : false,
+
+				// The pattern attribute must match the whole value, not just a subset:
+				// "...as if it implied a ^(?: at the start of the pattern and a )$ at the end."
+				re = new RegExp('^(?:' + pattern + ')$'),
 				value = $this.val(),
 				errorClass = settings.errorClass,
 				validClass = settings.validClass,
 				errorIDbare = $this.attr(settings.errorAttribute) || false, // Get the ID of the error element.
 				errorID = errorIDbare ? '#' + errorIDbare : false, // Add the hash for convenience. This is done in two steps to avoid two attribute lookups.
-				required = $this.data(settings.requiredVar),
+				required = false,
 				isValid = true,
-				reason = '';
+				reason = '',
+				$checkRequired = $('<input required>');
+
+				/*	If the required attribute exists, set it required to true, unless it's set 'false'.
+				*	This is a minor deviation from the spec, but it seems some browsers have falsey 
+				*	required values if the attribute is empty (should be true). The more conformant 
+				*	version of this failed sanity checking in the browser environment.
+				*	This plugin is meant to be practical, not ideologically married to the spec.
+				*/
+				// Feature fork
+				if ($checkRequired.filter('[required]') && $checkRequired.filter('[required]').length) {
+					required = ($this.filter('[required]').length && $this.attr('required') !== 'false') ? true : false;
+				} else {
+					required = ($this.attr('required') !== undefined) ? true : false;
+				}
 
 				if (settings.debug && window.console) {
 					console.log('Validate called on "' + value + '" with regex "' + re + '". Required: ' + required); // **DEBUG
-					if (re) {
-						console.log('Regex test: ' + re.test(value) + ', Regex: ' + re); // **DEBUG
-					}
+					console.log('Regex test: ' + re.test(value) + ', Pattern: ' + pattern); // **DEBUG
 				}
 
 				if (required && !value) {
 					isValid = false;
 					reason = 'required';
-				} else if (re && !re.test(value) && value) {
+				} else if (pattern && !re.test(value) && value) {
 					isValid = false;
 					reason = 'pattern';
 				} else {
 					isValid = true;
 					settings.markValid({
 						element: this,
-						errorClass: errorClass, 
-						validClass: validClass, 
-						errorID: errorID
+						errorClass: errorClass,
+						validClass: validClass,
+						errorID: errorID,
+						settings: settings
 					});
+					
 				}
 
 				if (!isValid) {
@@ -214,13 +234,18 @@
 			bindDelegation: function (settings) {
 				// Attach patterns from the library to elements.
 				$.each(patternLibrary, function (key, value) {
-					// ** TODO: Inline patterns should take precedence over the patternLibrary.
-					var pattern = value.toString(),
-						re;
+					var pattern = value.toString();
 					pattern = pattern.substring(1, pattern.length-1);
-					re = new RegExp('^(?:' + pattern + ')$');
-					$('.' + settings.classPrefix + key).data(settings.patternVar, re);
+					if (settings.debug && window.console) {
+						console.log('.' + settings.classPrefix + key + ' : ' + pattern);
+					}
+					$('.' + settings.classPrefix + key).attr('pattern', pattern);
 				});
+
+				$(this).filter('form').attr('novalidate', 'novalidate');
+				$(this).find('form').attr('novalidate', 'novalidate');
+				$(this).parents('form').attr('novalidate', 'novalidate');
+
 				return this.each(function () {
 					var kbEvents = {
 							focusout: settings.focusout,
@@ -285,46 +310,6 @@
 			}
 			re = new RegExp('^(?:' + pattern + ')$');
 			$(selector).data('regex', re);
-		},
-		getRules: function (options) {
-			var $checkRequired = $('<input required>').filter('[required]'),
-				$container = (options.container) ? $(options.container) : $(this),
-				requiredAttribute = options.requiredAttribute,
-				patternAttribute = options.patternAttribute;
-
-			$container.find('input, textarea, select').each(function () {
-				var $this = $(this),
-					required;
-
-				if ($checkRequired && $checkRequired.length) {
-					required = !!($this.filter('[' + requiredAttribute + ']').length && $this.attr(requiredAttribute) !== 'false');
-				} else {
-					required = !!($this.attr(requiredAttribute) !== undefined);
-				}
-
-				if ((required || required === false) && !$this.data(options.requiredVar)) {
-					$this.addClass(options.requiredClass).data(options.requiredVar, required);
-				}
-
-				$this.filter('[' + patternAttribute + ']').each(function () {
-					var $this = $(this),
-						pattern = $this.attr(patternAttribute),
-						// The pattern attribute must match the whole value, not just a subset:
-						// "...as if it implied a ^(?: at the start of the pattern and a )$ at the end."
-						re = new RegExp('^(?:' + pattern + ')$');
-
-					if (pattern && !$this.data(options.patternVar)) {
-						$this.data(options.patternVar, re);
-					}
-					return $this;
-				});
-
-				if (options.stripMarkup) {
-					$this.removeAttr(patternAttribute).removeAttr(requiredAttribute);
-				}
-
-				return $this;
-			});
 		}
 	};
 
@@ -343,9 +328,6 @@
 
 		// Expose public API.
 		$.extend($.fn.h5Validate, h5);
-
-		// Override defaults
-		$.h5Validate.getRules.call(this, settings);
 
 		// Returning the jQuery object allows for method chaining.
 		return methods.bindDelegation.call(this, settings);
