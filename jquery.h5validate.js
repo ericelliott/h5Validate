@@ -1,20 +1,20 @@
 /**
  * h5Validate
- * @version v0.5.2
+ * @version v0.6.0
  * Using semantic versioning: http://semver.org/
  * @author Eric Hamilton dilvie@dilvie.com
- * @copyright 2010 Eric Hamilton
+ * @copyright 2010 - 2011 Eric Hamilton
  * Dual licensed under the MIT and GPL licenses:
  * http://www.opensource.org/licenses/mit-license.php
  * http://www.gnu.org/licenses/gpl.html
  *
- * Developed under the sponsorship of Zumba Fitness, LLC, and Rese Property Management
+ * Developed under the sponsorship of Root Music, Zumba Fitness, LLC, and Rese Property Management
  */
 
 /*global jQuery window */
 /*jslint browser: true, devel: true, onevar: true, undef: true, nomen: true, eqeqeq: true, bitwise: true, regexp: true, newcap: true, immed: true */
 (function ($) {
-	var h5 = { // Public API
+    var h5 = { // Public API
 			defaults : {
 				debug: false,
 
@@ -80,6 +80,10 @@
 				// Validate on submit?
 				// **TODO: This isn't implemented, yet.
 				submit: true,
+				
+				// Callback stubs
+				invalidCallback: function () {},
+				validCallback: function () {},
 
 				// Mark field invalid.
 				// ** TODO: Highlight labels
@@ -99,6 +103,8 @@
 						}
 						$errorID.show();
 					}
+					$element.data('valid', false);
+					options.settings.invalidCallback.call(options.element);					
 					return $element;
 		        },
 
@@ -111,6 +117,8 @@
 					if ($errorID.length) {
 						$errorID.hide();
 					}
+					$element.data('valid', true);
+					options.settings.validCallback.call(options.element);
 					return $element;
 				},
 
@@ -129,6 +137,17 @@
 		patternLibrary = defaults.patternLibrary,
 
 		methods = {
+			isValid: function (settings) {
+				return (!!$(this).data('valid'));
+			},
+			allValid: function () {
+				var valid = true;
+				$(this).find('input, textarea, select').each(function() {
+					valid = $(this).h5Validate('isValid');
+					return valid;
+				});
+				return valid;
+			},
 			validate: function (settings) {
 				// Get the HTML5 pattern attribute if it exists.
 				// ** TODO: If a pattern class exists, grab the pattern from the patternLibrary, but the pattern attrib should override that value.
@@ -138,7 +157,8 @@
 				// The pattern attribute must match the whole value, not just a subset:
 				// "...as if it implied a ^(?: at the start of the pattern and a )$ at the end."
 				re = new RegExp('^(?:' + pattern + ')$'),
-				value = $this.val(),
+				value = ( $this.is('[type=checkbox]') || $this.is('[type=radio]') ) ?
+						$this.is(':checked') : $this.val(),
 				errorClass = settings.errorClass,
 				validClass = settings.validClass,
 				errorIDbare = $this.attr(settings.errorAttribute) || false, // Get the ID of the error element.
@@ -236,9 +256,6 @@
 				$.each(patternLibrary, function (key, value) {
 					var pattern = value.toString();
 					pattern = pattern.substring(1, pattern.length-1);
-					if (settings.debug && window.console) {
-						console.log('.' + settings.classPrefix + key + ' : ' + pattern);
-					}
 					$('.' + settings.classPrefix + key).attr('pattern', pattern);
 				});
 
@@ -316,7 +333,9 @@
 	$.fn.h5Validate = function (options) {
 		// Combine defaults and options to get current settings.
 		var settings = $.extend({}, defaults, options, methods),
-			activeClass = settings.classPrefix + settings.activeClass;
+			activeClass = settings.classPrefix + settings.activeClass,
+			action,
+			args;
 
 		$.extend(settings, {
 			activeClass: activeClass,
@@ -328,6 +347,15 @@
 
 		// Expose public API.
 		$.extend($.fn.h5Validate, h5);
+
+		if (typeof options === 'string' && typeof methods[options] === 'function') {
+			args = $.makeArray(arguments);
+			action = options;
+			args.shift();
+			args = $.merge(args, [settings]);
+			
+			return settings[action].apply(this, args);
+		}
 
 		// Returning the jQuery object allows for method chaining.
 		return methods.bindDelegation.call(this, settings);
