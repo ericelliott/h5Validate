@@ -138,11 +138,12 @@
 
 		methods = {
 			isValid: function (settings) {
+				alert($(this).data('valid'));
 				return (!!$(this).data('valid'));
 			},
 			allValid: function () {
 				var valid = true;
-				$(this).find('input, textarea, select').each(function() {
+				$(this).find('input:visible, textarea:visible, select:visible').each(function() {
 					valid = $(this).h5Validate('isValid');
 					return valid;
 				});
