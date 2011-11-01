@@ -84,6 +84,13 @@
 				// Callback stubs
 				invalidCallback: function () {},
 				validCallback: function () {},
+				
+				// When submitting, validate elements that haven't been validated yet?
+				// Defaulting to false to keep historical behavior consistent
+				validateOnSubmit: false,
+				
+				// Elements to validate with allValid (only validating visible elements)
+				allValidSelectors: 'input:visible, textarea:visible, select:visible',
 
 				// Mark field invalid.
 				// ** TODO: Highlight labels
@@ -141,7 +148,8 @@
 				var $this = $(this),
 					valid = $this.data('valid');
 				
-				if (typeof valid === 'undefined') { // validation has not been run on this element yet
+				// check if validation has not been run on this element yet
+				if (settings.validateOnSubmit && typeof valid === 'undefined') {
 					settings.validate.call(this, settings);
 					valid = $this.data('valid'); // get the validation result
 				}
@@ -150,7 +158,7 @@
 			},
 			allValid: function () {
 				var valid = true;
-				$(this).find('input:visible, textarea:visible, select:visible').each(function() {
+				$(this).find(settings.allValidSelectors).each(function() {
 					valid = $(this).h5Validate('isValid');
 					return valid;
 				});
