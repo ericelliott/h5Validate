@@ -86,8 +86,7 @@
 				validCallback: function () {},
 				
 				// When submitting, validate elements that haven't been validated yet?
-				// Defaulting to false to keep historical behavior consistent
-				validateOnSubmit: false,
+				validateOnSubmit: true,
 				
 				// Elements to validate with allValid (only validating visible elements)
 				allValidSelectors: 'input:visible, textarea:visible, select:visible',
