@@ -156,7 +156,7 @@
 				
 				return (!!valid);
 			},
-			allValid: function () {
+			allValid: function (settings) {
 				var valid = true;
 				$(this).find(settings.allValidSelectors).each(function() {
 					valid = $(this).h5Validate('isValid');
