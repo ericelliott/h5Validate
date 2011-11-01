@@ -138,8 +138,12 @@
 
 		methods = {
 			isValid: function (settings) {
-				alert($(this).data('valid'));
-				return (!!$(this).data('valid'));
+				var valid = $(this).data('valid');
+				
+				if (typeof valid === 'undefined') // validation has not been run on this element yet
+					settings.validate.call(this, settings);
+				
+				return (!!valid);
 			},
 			allValid: function () {
 				var valid = true;
