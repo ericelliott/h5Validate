@@ -1,6 +1,6 @@
 /**
  * h5Validate
- * @version v0.6.0
+ * @version v0.6.2
  * Using semantic versioning: http://semver.org/
  * @author Eric Hamilton dilvie@dilvie.com
  * @copyright 2010 - 2011 Eric Hamilton
