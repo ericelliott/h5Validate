@@ -9,7 +9,7 @@
 -->
 
 		<link href="style01.css" media="screen" rel="stylesheet" type="text/css" />
-
+		<link href="http://code.jquery.com/qunit/qunit-git.css" rel="stylesheet" />
 		<script type="text/javascript">
 
 		  var _gaq = _gaq || [];
@@ -94,7 +94,7 @@
 		
 		<form class="h5-defaults">
 			<label for="email">Email:</label>
-			<input type="text" class="h5-email" required />
+			<input id="email" type="text" class="h5-email" required />
 		</form>
 		
 		<h4>Source:</h4>
@@ -193,19 +193,18 @@
 			</dl>
 		</dl>
 		</div>
-		
-		<h3>Coming soon!</h3>
-		
-		<dl>
-		<dt>submit</dt><dd><p>(Event) Set true to trigger validation on submit. Submit needs a special handler, because it needs to check that all fields are valid, optionally save data, and optionally submit the form. Will have Ajax, get, and post. Default:</p>
-			<code class="block">submit: true</code>
-		</dd>
-		
-		<dt>messages</dt><dd><p>Error messages to display. This is here so that you can easily swap them out. You might want to write your own error messages, or provide language translations.</p></dd>		
-		</dl>
+		<a href="#run-tests" id="run-tests">Run Tests</a>
+		<h1 id="qunit-header">QUnit Test Suite</h1>  
+			<h2 id="qunit-banner"></h2>  
+			<div id="qunit-testrunner-toolbar"></div>  
+			<h2 id="qunit-userAgent"></h2>  
+			<ol id="qunit-tests"></ol>
 
-		<script src="lib/jquery/jquery-1.4.2.min.js"></script>
+		<script src="http://code.jquery.com/jquery.js"></script>
 		<script src="jquery.h5validate.js"></script>
+		<script src="http://code.jquery.com/qunit/qunit-git.js"></script>
+		<script src="test/test.h5validate.js"></script>
+
 		<script>
 		$(document).ready(function () {
 
@@ -215,6 +214,10 @@
 		    $('form.h5-defaults').h5Validate();
 			$('#black').h5Validate({
 				errorClass:'black'
+			});
+
+			$('#run-tests').click(function () {
+				runTests();
 			});
 		});
 		</script>
