@@ -153,8 +153,7 @@
 			allValid: function (settings) {
 				var valid = true;
 				$(this).find(settings.allValidSelectors).each(function() {
-					valid = $(this).h5Validate('isValid');
-					return valid;
+					valid = $(this).h5Validate('isValid') && valid;
 				});
 				return valid;
 			},
