@@ -11,7 +11,7 @@
  * Developed under the sponsorship of Root Music, Zumba Fitness, LLC, and Rese Property Management
  */
 
-/*global jQuery window */
+/*global jQuery, window */
 /*jslint browser: true, devel: true, onevar: true, undef: true, nomen: true, eqeqeq: true, bitwise: true, regexp: true, newcap: true, immed: true */
 (function ($) {
     var h5 = { // Public API
@@ -39,10 +39,6 @@
 					alphaNumeric: /\w+/,
 					integer: /-?\d+/
 				},
-				messages : {
-					required: 'This is a required field.',
-					invalid: 'Please correct this field.'
-				},
 
 				// The prefix to use for dynamically-created class names.
 				classPrefix: 'h5-',
@@ -58,14 +54,14 @@
 				errorAttribute: 'data-h5-errorid',
 
 				// Setup KB event delegation.
-				kbSelectors: ':text, :password, select, textarea',
+				kbSelectors: 'input, select, textarea',
 				focusout: true,
 				focusin: false,
 				change: true,
 				keyup: false,
 
 				// Setup mouse event delegation.
-				mSelectors: ':radio, :checkbox, select, option',
+				mSelectors: ':range, :radio, :checkbox, select, option',
 				click: true,
 
 				activeKeyup: true,
@@ -139,7 +135,6 @@
 		},
 		// Aliases
 		defaults = h5.defaults,
-		messages = defaults.messages,
 		patternLibrary = defaults.patternLibrary,
 
 		methods = {
@@ -331,7 +326,7 @@
 				pattern = '',
 				re;
 			// Build regex pattern
-			for (i = 0; i < ln; i++) {
+			for (i = 0; i < ln; i+=1) {
 				pattern = pattern ? pattern + '|' + values[i] : values[i];
 			}
 			re = new RegExp('^(?:' + pattern + ')$');
@@ -351,8 +346,6 @@
 			activeClassSelector: '.' + activeClass,
 			requiredClass: settings.classPrefix + settings.requiredClass
 		});
-
-		settings.messages = messages;
 
 		// Expose public API.
 		$.extend($.fn.h5Validate, h5);
