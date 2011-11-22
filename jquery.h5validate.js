@@ -1,6 +1,6 @@
 /**
  * h5Validate
- * @version v0.6.3
+ * @version v0.6.4
  * Using semantic versioning: http://semver.org/
  * @author Eric Hamilton dilvie@dilvie.com
  * @copyright 2010 - 2011 Eric Hamilton
@@ -54,14 +54,14 @@
 				errorAttribute: 'data-h5-errorid',
 
 				// Setup KB event delegation.
-				kbSelectors: 'input, select, textarea',
+				kbSelectors: ':input',
 				focusout: true,
 				focusin: false,
 				change: true,
 				keyup: false,
 
 				// Setup mouse event delegation.
-				mSelectors: ':range, :radio, :checkbox, select, option',
+				mSelectors: '[type="range"], :radio, :checkbox, select, option',
 				click: true,
 
 				activeKeyup: true,
