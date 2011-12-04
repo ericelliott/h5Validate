@@ -53,18 +53,22 @@
 				// Attribute which stores the ID of the error container element (without the hash).
 				errorAttribute: 'data-h5-errorid',
 
+				// Events API
+				customEvents: {
+					'validate': true
+				},
+
 				// Setup KB event delegation.
 				kbSelectors: ':input',
 				focusout: true,
 				focusin: false,
 				change: true,
 				keyup: false,
+				activeKeyup: true,
 
 				// Setup mouse event delegation.
 				mSelectors: '[type="range"], :radio, :checkbox, select, option',
 				click: true,
-
-				activeKeyup: true,
 
 				// What do we name the required .data variable?
 				requiredVar: 'h5-required',
@@ -280,7 +284,8 @@
 						activeEvents = {
 							keyup:settings.activeKeyup
 						};
-
+					
+					settings.delegateEvents(':input', settings.customEvents, this, settings);
 					settings.delegateEvents(settings.kbSelectors, kbEvents, this, settings);
 					settings.delegateEvents(settings.mSelectors, mEvents, this, settings);
 					settings.delegateEvents(settings.activeClassSelector, activeEvents, this, settings);
