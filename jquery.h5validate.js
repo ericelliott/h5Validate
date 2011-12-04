@@ -1,6 +1,6 @@
 /**
  * h5Validate
- * @version v0.6.4
+ * @version v0.7.0
  * Using semantic versioning: http://semver.org/
  * @author Eric Hamilton dilvie@dilvie.com
  * @copyright 2010 - 2011 Eric Hamilton
@@ -145,7 +145,7 @@
 			isValid: function (settings) {
 				var $this = $(this);
 
-				settings.validate.call(this, settings);
+				$this.trigger('validate');
 
 				return $this.data('valid'); // get the validation result
 			},
