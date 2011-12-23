@@ -1,22 +1,25 @@
 /**
  * h5Validate
- * @version v0.7.0
+ * @version v0.7.1
  * Using semantic versioning: http://semver.org/
- * @author Eric Hamilton dilvie@dilvie.com
+ * @author Eric Hamilton http://ericleads.com/
  * @copyright 2010 - 2011 Eric Hamilton
  * Dual licensed under the MIT and GPL licenses:
  * http://www.opensource.org/licenses/mit-license.php
  * http://www.gnu.org/licenses/gpl.html
  *
- * Developed under the sponsorship of Root Music, Zumba Fitness, LLC, and Rese Property Management
+ * Developed under the sponsorship of RootMusic, Zumba Fitness, LLC, and Rese Property Management
  */
 
-/*global jQuery, window */
-/*jslint browser: true, devel: true, onevar: true, undef: true, nomen: true, eqeqeq: true, bitwise: true, regexp: true, newcap: true, immed: true */
+/*global jQuery, window, console */
 (function ($) {
-    var h5 = { // Public API
+	'use strict';
+	var console = window.console || function () {},
+		h5 = { // Public API
 			defaults : {
 				debug: false,
+
+				RODom: false,
 
 				// HTML5-compatible validation pattern library that can be extended and/or overriden.
 				patternLibrary : { //** TODO: Test the new regex patterns. Should I apply these to the new input types?
@@ -72,7 +75,7 @@
 
 				// What do we name the required .data variable?
 				requiredVar: 'h5-required',
-				
+
 				// What do we name the pattern .data variable?
 				patternVar: 'h5-pattern',
 				stripMarkup: true,
@@ -80,14 +83,14 @@
 				// Validate on submit?
 				// **TODO: This isn't implemented, yet.
 				submit: true,
-				
+
 				// Callback stubs
 				invalidCallback: function () {},
 				validCallback: function () {},
-				
+
 				// When submitting, validate elements that haven't been validated yet?
 				validateOnSubmit: true,
-				
+
 				// Elements to validate with allValid (only validating visible elements)
 				allValidSelectors: 'input:visible, textarea:visible, select:visible',
 
@@ -95,7 +98,7 @@
 				// ** TODO: Highlight labels
 				// ** TODO: Implement setCustomValidity as per the spec:
 				// http://www.whatwg.org/specs/web-apps/current-work/multipage/association-of-controls-and-forms.html#dom-cva-setcustomvalidity
-				markInvalid: function (options) { 
+				markInvalid: function markInvalid(options) {
 					var $element = $(options.element),
 						$errorID = $(options.errorID);
 					$element.addClass(options.errorClass).removeClass(options.validClass);
@@ -110,12 +113,12 @@
 						$errorID.show();
 					}
 					$element.data('valid', false);
-					options.settings.invalidCallback.call(options.element);					
+					options.settings.invalidCallback.call(options.element);
 					return $element;
-		        },
+				},
 
 				// Mark field valid.
-				markValid: function (options) {
+				markValid: function markValid(options) {
 					var $element = $(options.element),
 						$errorID = $(options.errorID);
 
@@ -129,12 +132,12 @@
 				},
 
 				// Unmark field
-				unmark: function (options) {
+				unmark: function unmark(options) {
 					var $element = $(options.element);
 					$element.removeClass(options.errorClass).removeClass(options.validClass);
 					$element.form.find("#" + options.element.id).removeClass(options.errorClass).removeClass(options.validClass);
 					return $element;
-				}	
+				}
 			}
 		},
 		// Aliases
@@ -142,7 +145,7 @@
 		patternLibrary = defaults.patternLibrary,
 
 		methods = {
-			isValid: function (settings) {
+			isValid: function () {
 				var $this = $(this);
 
 				$this.trigger('validate');
@@ -151,7 +154,7 @@
 			},
 			allValid: function (settings) {
 				var valid = true;
-				$(this).find(settings.allValidSelectors).each(function() {
+				$(this).find(settings.allValidSelectors).each(function () {
 					valid = $(this).h5Validate('isValid') && valid;
 				});
 				return valid;
@@ -162,19 +165,19 @@
 				var $this = $(this),
 					pattern = $this.filter('[pattern]')[0] ? $this.attr('pattern') : false,
 
-				// The pattern attribute must match the whole value, not just a subset:
-				// "...as if it implied a ^(?: at the start of the pattern and a )$ at the end."
-				re = new RegExp('^(?:' + pattern + ')$'),
-				value = ( $this.is('[type=checkbox]') || $this.is('[type=radio]') ) ?
-						$this.is(':checked') : $this.val(),
-				errorClass = settings.errorClass,
-				validClass = settings.validClass,
-				errorIDbare = $this.attr(settings.errorAttribute) || false, // Get the ID of the error element.
-				errorID = errorIDbare ? '#' + errorIDbare : false, // Add the hash for convenience. This is done in two steps to avoid two attribute lookups.
-				required = false,
-				isValid = true,
-				reason = '',
-				$checkRequired = $('<input required>');
+					// The pattern attribute must match the whole value, not just a subset:
+					// "...as if it implied a ^(?: at the start of the pattern and a )$ at the end."
+					re = new RegExp('^(?:' + pattern + ')$'),
+					value = ($this.is('[type=checkbox]') || $this.is('[type=radio]')) ?
+							$this.is(':checked') : $this.val(),
+					errorClass = settings.errorClass,
+					validClass = settings.validClass,
+					errorIDbare = $this.attr(settings.errorAttribute) || false, // Get the ID of the error element.
+					errorID = errorIDbare ? '#' + errorIDbare : false, // Add the hash for convenience. This is done in two steps to avoid two attribute lookups.
+					required = false,
+					isValid = true,
+					reason = '',
+					$checkRequired = $('<input required>');
 
 				/*	If the required attribute exists, set it required to true, unless it's set 'false'.
 				*	This is a minor deviation from the spec, but it seems some browsers have falsey 
@@ -209,7 +212,6 @@
 						errorID: errorID,
 						settings: settings
 					});
-					
 				}
 
 				if (!isValid) {
@@ -243,7 +245,7 @@
 						events[key] = key;
 					}
 				});
-				key=0;
+				// key = 0;
 				for (key in events) {
 					if (events.hasOwnProperty(key)) {
 						$(element).delegate(selectors, events[key] + '.h5Validate', validate);
@@ -263,7 +265,7 @@
 				// Attach patterns from the library to elements.
 				$.each(patternLibrary, function (key, value) {
 					var pattern = value.toString();
-					pattern = pattern.substring(1, pattern.length-1);
+					pattern = pattern.substring(1, pattern.length - 1);
 					$('.' + settings.classPrefix + key).attr('pattern', pattern);
 				});
 
@@ -282,15 +284,42 @@
 							click: settings.click
 						},
 						activeEvents = {
-							keyup:settings.activeKeyup
+							keyup: settings.activeKeyup
 						};
-					
+
 					settings.delegateEvents(':input', settings.customEvents, this, settings);
 					settings.delegateEvents(settings.kbSelectors, kbEvents, this, settings);
 					settings.delegateEvents(settings.mSelectors, mEvents, this, settings);
 					settings.delegateEvents(settings.activeClassSelector, activeEvents, this, settings);
 				});
 			}
+		},
+
+		instances = [],
+
+		buildSettings = function buildSettings(options) {
+			// Combine defaults and options to get current settings.
+			var settings = $.extend({}, defaults, options, methods),
+				activeClass = settings.classPrefix + settings.activeClass;
+
+			return $.extend(settings, {
+				activeClass: activeClass,
+				activeClassSelector: '.' + activeClass,
+				requiredClass: settings.classPrefix + settings.requiredClass
+			});
+		},
+
+		getInstance = function getInstance() {
+			var $parent = $(this).closest('[data-h5-instanceId]');
+			return instances[$parent.attr('data-h5-instanceId')];
+		},
+
+		setInstance = function setInstance(settings) {
+			var instanceId = instances.push(settings) - 1;
+			if (settings.RODom !== true) {
+				$(this).attr('data-h5-instanceId', instanceId);
+			}
+			$(this).trigger('attr', { 'data-h5-instanceId': instanceId });
 		};
 
 	$.h5Validate = {
@@ -331,7 +360,7 @@
 				pattern = '',
 				re;
 			// Build regex pattern
-			for (i = 0; i < ln; i+=1) {
+			for (i = 0; i < ln; i += 1) {
 				pattern = pattern ? pattern + '|' + values[i] : values[i];
 			}
 			re = new RegExp('^(?:' + pattern + ')$');
@@ -339,30 +368,25 @@
 		}
 	};
 
-	$.fn.h5Validate = function (options) {
-		// Combine defaults and options to get current settings.
-		var settings = $.extend({}, defaults, options, methods),
-			activeClass = settings.classPrefix + settings.activeClass,
-			action,
-			args;
-
-		$.extend(settings, {
-			activeClass: activeClass,
-			activeClassSelector: '.' + activeClass,
-			requiredClass: settings.classPrefix + settings.requiredClass
-		});
-
-		// Expose public API.
-		$.extend($.fn.h5Validate, h5);
+	$.fn.h5Validate = function h5Validate(options) {
+		var	action,
+			args,
+			settings;
 
 		if (typeof options === 'string' && typeof methods[options] === 'function') {
-			args = $.makeArray(arguments);
+			// Whoah, hold on there! First we need to get the instance:
+			settings = getInstance.call(this);
+
+			args = [].slice.call(arguments, 0);
 			action = options;
 			args.shift();
 			args = $.merge(args, [settings]);
-			
+
 			return settings[action].apply(this, args);
 		}
+
+		settings = buildSettings(options);
+		setInstance.call(this, settings);
 
 		// Returning the jQuery object allows for method chaining.
 		return methods.bindDelegation.call(this, settings);

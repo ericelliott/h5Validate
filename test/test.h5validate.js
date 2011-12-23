@@ -38,6 +38,43 @@
 			$input.h5Validate('isValid');
 			ok($errordiv.is(':visible'), 'Error message displays when input is invalid');
 		});
+
+		test('Instance safe for method calls:', function () {
+			var $form = $('<form>', {
+					id: 'instanceTest',
+				}),
+				test1;
+			
+			$form.html('<input required id="instance-input"/>'
+				+ '<select type="select" name="BillingCountry" id="BillingCountry" required="required">'
+				+ '<option value="">-- Choose Country --</option>'
+				+ '<option value="SE">Sweden</option>'
+				+ '<option value="AX">Aland islands</option>'
+				+ '<option value="DK">Denmark</option>'
+				+ '<option value="FI">Finland</option>'
+				+ '<option value="NO">Norway</option>'
+				+ '</select>')
+				.appendTo('body');
+
+			$form.bind('attr', function (event, data) {
+				ok(data, 'Instance create event works.');
+			});
+
+			$form.h5Validate({
+				allValidSelectors: 'select'
+			});
+
+			$("#BillingCountry option:eq(2)").attr("selected", "selected");
+
+			test1 = $form.h5Validate('allValid');
+			ok(test1, 'Methods are instance safe.');
+		});
+
+		//TODO: Don't attempt to validate disabled fields
+		
+		//TODO: Validate radio buttons correctly. (Any checked field satisfies required)
+
+
 	}
 	exports.runTests = runTests;
 }((typeof exports !== 'undefined') ? exports : window));
