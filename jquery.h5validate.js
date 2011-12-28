@@ -178,7 +178,7 @@
 					});
 					valid = $(this).h5Validate('isValid') && valid;
 				});
-				$this.trigger('formValidated', {elements: formValidity});
+				$this.trigger('formValidated', {valid: valid, elements: formValidity});
 				return valid;
 			},
 			validate: function (settings) {
@@ -347,7 +347,7 @@
 			if (settings.RODom !== true) {
 				$(this).attr('data-h5-instanceId', instanceId);
 			}
-			$(this).trigger('attr', { 'data-h5-instanceId': instanceId });
+			$(this).trigger('instance', { 'data-h5-instanceId': instanceId });
 		};
 
 	$.h5Validate = {

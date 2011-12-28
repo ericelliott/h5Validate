@@ -109,41 +109,6 @@
 		<input id="FirstName" type="text" data-h5-errorid="invalid-FirstName" title="Required: Please provide your first name." required />
 		<div id="invalid-FirstName" class="ui-state-error message" style="display:none;">This stuff will get replaced by the title contents.</div>
 		</form>
-		
-		<section>
-		<h2>New Input Types (Use with caution.)</h2>
-
-		<div class="announce">
-			<p><strong>Warning:</strong> Each browser has its own way of treating these new input types. iOS might swap out the on-screen keyboard (cool!), while Chrome renders custom UI controls that don't always make sense (like up and down arrows for <code>datetime</code> inputs.)</p>
-			
-			<p>What's worse, some of the styles that get applied to these elements are browser-specific, and ignore CSS cascading -- so before you can add your own look and feel, you first have to turn off each native browser's look and feel. For example, h5Validate works just fine on that search field down there, but in Chrome, it ignores our CSS because you first have to turn off <code>-webkit-appearance: searchfield;</code> before you style it. (Hint: You may want to search for a good HTML5 CSS reset). I've left it as is to demonstrate how irritating all of this can be. Good luck, and don't say I didn't warn you.</p>
-		</div>
-
-		<p>h5Validate does not currently validate new element types automatically. The <code>pattern</code> and <code>required</code> attributes work fine, but h5Validate <strong>will not</strong> automatically apply email validation to fields with <code>type="email"</code>. (Yet...)</p>
-
-		<p>The plan is to create a thorough testsuite to make sure these validations comply with the html5 standard prior to implementation. So far, it looks like some of the browser implementations are inconsistent. We'll be sharing test cases and filing bug reports in an effort to get all of these validations behaving the same way. Any help with the effort is appreciated. In particular, test cases that show how various implementations differ from the spec would be great. Eventually, we'll defer to the native browser implementation if it's available, with a fall-back to h5Validate's built-in validation rules.</p>
-
-		<p>For you bleeding-edge junkies, here are the new input types:</p>
-		</div>
-
-		<!-- https://developer.mozilla.org/en/HTML/Forms_in_HTML -->
-		<form id="newTypes">
-			<div><input required title="normal" /></div>
-			<div><input type="tel" required /></div>
-			<div><input type="search" required /></div>
-			<div><input type="email" required /></div>
-			<div><input type="url" required /></div>
-			<div><input type="datetime" required /></div>
-			<div><input type="date" required /></div>
-			<div><input type="month" required /></div>
-			<div><input type="week" required /></div>
-			<div><input type="time" required /></div>
-			<div><input type="datetime-local" required /></div>
-			<div><input type="number" required /></div>
-			<div><input type="range" required /></div>
-			<div><input type="color" required /></div>
-		</form>
-		</section>
 
 		<h2>Options</h2>
 				
@@ -181,6 +146,36 @@
 			<p><em>Note: The click event isn't just for the mouse. It will trigger for keyboard and touch screen interactions, too.</em></p>
 			<code class="block">click: true</code>
 		</dd>
+
+		<section>
+			<h2>Event API</h2>
+			<p>h5Validate supports the following events:</p>
+
+			<dl>
+				<dt><code>instance</code></dt>
+				<dd>Instance created.</dd>
+				
+				<dt><code>validated</code></dt>
+				<dd>The element in question has been validated. A validity object is passed into the event handler containing:
+				<code><pre>{
+	element: HTMLObject, // A reference to the validated element
+	customError: Bool, // Custom validity failed.
+	patternMismatch: Bool, // Input does not match pattern
+	rangeOverflow: Bool, // Input is greater than max attribute value
+	rangeUnderflow: Bool, // Input is less than min attribute value
+	stepMismatch: Bool, // Input does not conform to the step attribute setting
+	tooLong: Bool, // Input is too long
+	typeMismatch: Bool, // Wrong input type
+	valid: Bool, // Input is valid
+	valueMissing: Bool // Required value is missing
+}</pre></code>
+				</dd>
+
+				<dt><code>formValidated</code></dt>
+				<dd>The form in question has been validated. An object is passed with an object containing a bool, <code>valid</code>, and an array of validity objects corresponding to the validated elements.</dd>
+			</dl>
+		</section>
+
 
 		<div class="method">
 		<h2>Methods</h2>
@@ -227,6 +222,42 @@
 			</dl>
 		</dl>
 		</div>
+
+		<section>
+		<h2>New Input Types (Use with caution.)</h2>
+
+		<div class="announce">
+			<p><strong>Warning:</strong> Each browser has its own way of treating these new input types. iOS might swap out the on-screen keyboard (cool!), while Chrome renders custom UI controls that don't always make sense (like up and down arrows for <code>datetime</code> inputs.)</p>
+			
+			<p>What's worse, some of the styles that get applied to these elements are browser-specific, and ignore CSS cascading -- so before you can add your own look and feel, you first have to turn off each native browser's look and feel. For example, h5Validate works just fine on that search field down there, but in Chrome, it ignores our CSS because you first have to turn off <code>-webkit-appearance: searchfield;</code> before you style it. (Hint: You may want to search for a good HTML5 CSS reset). I've left it as is to demonstrate how irritating all of this can be. Good luck, and don't say I didn't warn you.</p>
+		</div>
+
+		<p>h5Validate does not currently validate new element types automatically. The <code>pattern</code> and <code>required</code> attributes work fine, but h5Validate <strong>will not</strong> automatically apply email validation to fields with <code>type="email"</code>, etc.. (Yet.)</p>
+
+		<p>The plan is to create a thorough testsuite to make sure these validations comply with the html5 standard prior to implementation. So far, it looks like some of the browser implementations are inconsistent. We'll be sharing test cases and filing bug reports in an effort to get all of these validations behaving the same way. Any help with the effort is appreciated. In particular, test cases that show how various implementations differ from the spec would be great. Eventually, we'll defer to the native browser implementation if it's available, with a fall-back to h5Validate's built-in validation rules.</p>
+
+		<p>For you bleeding-edge junkies, here are the new input types:</p>
+		</div>
+
+		<!-- https://developer.mozilla.org/en/HTML/Forms_in_HTML -->
+		<form id="newTypes">
+			<div><input required title="normal" /></div>
+			<div><input type="tel" required /></div>
+			<div><input type="search" required /></div>
+			<div><input type="email" required /></div>
+			<div><input type="url" required /></div>
+			<div><input type="datetime" required /></div>
+			<div><input type="date" required /></div>
+			<div><input type="month" required /></div>
+			<div><input type="week" required /></div>
+			<div><input type="time" required /></div>
+			<div><input type="datetime-local" required /></div>
+			<div><input type="number" required /></div>
+			<div><input type="range" required /></div>
+			<div><input type="color" required /></div>
+		</form>
+		</section>
+		
 		<a href="#run-tests" id="run-tests">Run Tests</a>
 		<h1 id="qunit-header">QUnit Test Suite</h1>  
 			<h2 id="qunit-banner"></h2>  

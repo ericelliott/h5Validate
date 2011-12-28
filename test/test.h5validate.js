@@ -59,7 +59,7 @@
 				+ '</select>')
 				.appendTo('body');
 
-			$form.bind('attr', function (event, data) {
+			$form.bind('instance', function (event, data) {
 				ok(data, 'Instance create event works.');
 			});
 
