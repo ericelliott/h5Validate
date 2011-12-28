@@ -1,4 +1,7 @@
+
+/*global window, $, module, test, ok, equal, exports */
 (function (exports) {
+	'use strict';
 	function runTests() {
 		module('h5Validate');
 
@@ -18,7 +21,7 @@
 			var $input = $('#birthdate');
 			ok(($input.h5Validate('isValid')), 'Optional input should be valid when empty.');
 			$input.val('01/01/2010');
-			ok(($input.h5Validate('isValid')), 'Input should be valid when given valid input.');		
+			ok(($input.h5Validate('isValid')), 'Input should be valid when given valid input.');
 			$input.val('foo');
 			ok((!$input.h5Validate('isValid')), 'Input should be invalid when given invalid input.');
 		});
@@ -26,7 +29,7 @@
 		test('Pattern library:', function () {
 			var $input = $('#email');
 			$input.val('test@example.com');
-			ok(($input.h5Validate('isValid')), 'Input should be valid when given valid input.');		
+			ok(($input.h5Validate('isValid')), 'Input should be valid when given valid input.');
 			$input.val('invalid email');
 			ok((!$input.h5Validate('isValid')), 'Input should be invalid when given invalid input.');
 		});
@@ -41,10 +44,10 @@
 
 		test('Instance safe for method calls:', function () {
 			var $form = $('<form>', {
-					id: 'instanceTest',
+					id: 'instanceTest'
 				}),
 				test1;
-			
+
 			$form.html('<input required id="instance-input"/>'
 				+ '<select type="select" name="BillingCountry" id="BillingCountry" required="required">'
 				+ '<option value="">-- Choose Country --</option>'
@@ -70,11 +73,69 @@
 			ok(test1, 'Methods are instance safe.');
 		});
 
-		//TODO: Don't attempt to validate disabled fields
-		
+		test('Validated events:', function () {
+			var $form = $('<form>', {
+					id: 'eventTest'
+				}),
+				$input;
+
+			$form.html('<input required id="event-input"/>')
+				.appendTo('body');
+
+			$input = $('#event-input');
+
+			$form.h5Validate();
+
+			$input.bind('validated', function (event, data) {
+				ok(data, 'Validated event triggers.');
+				equal(data.element, $input[0], 'Element is correct.');
+				equal(data.valid, true, 'Element is valid.');
+			});
+
+			$form.bind('formValidated', function (event, data) {
+				ok(data, 'formValidated triggers.');
+				equal(data.elements[0].element, $input[0], 'Form element 0 is correct.');
+				equal(data.elements[0].valid, true, 'Element is valid.');
+			});
+
+			$input.val('test');
+			$form.h5Validate('allValid');
+		});
+
+		test('Issue #29: Disabled fields gum up the works.', function () {
+			var $form = $('<form>', {
+					id: 'disabledTest'
+				}),
+				$input;
+
+			$form.html('<input required id="disabled-input" disabled required /><input />')
+				.appendTo('body');
+
+			$input = $('#disabled-input');
+
+			$form.h5Validate();
+
+			ok($form.h5Validate('allValid'), 'Disabled fields get skipped.');
+		});
+
+		test('Issue #26: Need a .novalidate class.', function () {
+			var $form = $('<form>', {
+					id: 'novalidateTest'
+				}),
+				$input;
+
+			$form.html('<input required id="novalidate-input" class="novalidate" required /><input />')
+				.appendTo('body');
+
+			$input = $('#novalidate-input');
+
+			$form.h5Validate();
+
+			ok($form.h5Validate('allValid'), '.novalidate fields get skipped.');
+			
+		});
+
 		//TODO: Validate radio buttons correctly. (Any checked field satisfies required)
-
-
 	}
 	exports.runTests = runTests;
 }((typeof exports !== 'undefined') ? exports : window));

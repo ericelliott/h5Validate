@@ -1,6 +1,6 @@
 /**
  * h5Validate
- * @version v0.7.1
+ * @version v0.8.0
  * Using semantic versioning: http://semver.org/
  * @author Eric Hamilton http://ericleads.com/
  * @copyright 2010 - 2011 Eric Hamilton
@@ -62,7 +62,7 @@
 				},
 
 				// Setup KB event delegation.
-				kbSelectors: ':input',
+				kbSelectors: ':input:not(:button):not(:disabled):not(.novalidate)',
 				focusout: true,
 				focusin: false,
 				change: true,
@@ -70,7 +70,7 @@
 				activeKeyup: true,
 
 				// Setup mouse event delegation.
-				mSelectors: '[type="range"], :radio, :checkbox, select, option',
+				mSelectors: '[type="range"]:not(:disabled):not(.novalidate), :radio:not(:disabled):not(.novalidate), :checkbox:not(:disabled):not(.novalidate), select:not(:disabled):not(.novalidate), option:not(:disabled):not(.novalidate)',
 				click: true,
 
 				// What do we name the required .data variable?
@@ -92,7 +92,7 @@
 				validateOnSubmit: true,
 
 				// Elements to validate with allValid (only validating visible elements)
-				allValidSelectors: 'input:visible, textarea:visible, select:visible',
+				allValidSelectors: ':input:visible:not(:button):not(:disabled):not(.novalidate)',
 
 				// Mark field invalid.
 				// ** TODO: Highlight labels
@@ -113,7 +113,7 @@
 						$errorID.show();
 					}
 					$element.data('valid', false);
-					options.settings.invalidCallback.call(options.element);
+					options.settings.invalidCallback.call(options.element, options.validity);
 					return $element;
 				},
 
@@ -127,7 +127,7 @@
 						$errorID.hide();
 					}
 					$element.data('valid', true);
-					options.settings.validCallback.call(options.element);
+					options.settings.validCallback.call(options.element, options.validity);
 					return $element;
 				},
 
@@ -144,6 +144,20 @@
 		defaults = h5.defaults,
 		patternLibrary = defaults.patternLibrary,
 
+		createValidity = function createValidity(validity) {
+			return $.extend({
+				customError: validity.customError || false,
+				patternMismatch: validity.patternMismatch || false,
+				rangeOverflow: validity.rangeOverflow || false,
+				rangeUnderflow: validity.rangeUnderflow || false,
+				stepMismatch: validity.stepMismatch || false,
+				tooLong: validity.tooLong || false,
+				typeMismatch: validity.typeMismatch || false,
+				valid: validity.valid || true,
+				valueMissing: validity.valueMissing || false
+			}, validity);
+		},
+
 		methods = {
 			isValid: function () {
 				var $this = $(this);
@@ -153,10 +167,18 @@
 				return $this.data('valid'); // get the validation result
 			},
 			allValid: function (settings) {
-				var valid = true;
-				$(this).find(settings.allValidSelectors).each(function () {
+				var valid = true,
+					formValidity = [],
+					$this = $(this);
+				$this.find(settings.allValidSelectors).each(function () {
+					var $this = $(this);
+					$this.bind('validated', function (e, data) {
+						data.e = e;
+						formValidity.push(data);
+					});
 					valid = $(this).h5Validate('isValid') && valid;
 				});
+				$this.trigger('formValidated', {elements: formValidity});
 				return valid;
 			},
 			validate: function (settings) {
@@ -175,8 +197,7 @@
 					errorIDbare = $this.attr(settings.errorAttribute) || false, // Get the ID of the error element.
 					errorID = errorIDbare ? '#' + errorIDbare : false, // Add the hash for convenience. This is done in two steps to avoid two attribute lookups.
 					required = false,
-					isValid = true,
-					reason = '',
+					validity = createValidity({element: this, valid: true}),
 					$checkRequired = $('<input required>');
 
 				/*	If the required attribute exists, set it required to true, unless it's set 'false'.
@@ -187,9 +208,9 @@
 				*/
 				// Feature fork
 				if ($checkRequired.filter('[required]') && $checkRequired.filter('[required]').length) {
-					required = ($this.filter('[required]').length && $this.attr('required') !== 'false') ? true : false;
+					required = ($this.filter('[required]').length && $this.attr('required') !== 'false');
 				} else {
-					required = ($this.attr('required') !== undefined) ? true : false;
+					required = ($this.attr('required') !== undefined);
 				}
 
 				if (settings.debug && window.console) {
@@ -198,32 +219,39 @@
 				}
 
 				if (required && !value) {
-					isValid = false;
-					reason = 'required';
+					validity.valid = false;
+					validity.valueMissing = true;
 				} else if (pattern && !re.test(value) && value) {
-					isValid = false;
-					reason = 'pattern';
+					validity.valid = false;
+					validity.patternMismatch = true;
 				} else {
-					isValid = true;
-					settings.markValid({
-						element: this,
-						errorClass: errorClass,
-						validClass: validClass,
-						errorID: errorID,
-						settings: settings
-					});
+					validity.valid = true; // redundant?
+
+					if (!settings.RODom) {
+						settings.markValid({
+							element: this,
+							validity: validity,
+							errorClass: errorClass,
+							validClass: validClass,
+							errorID: errorID,
+							settings: settings
+						});
+					}
 				}
 
-				if (!isValid) {
-					settings.markInvalid({
-						element: this,
-						reason: reason,
-						errorClass: errorClass,
-						validClass: validClass,
-						errorID: errorID,
-						settings: settings
-					});
+				if (!validity.valid) {
+					if (!settings.RODom) {
+						settings.markInvalid({
+							element: this,
+							validity: validity,
+							errorClass: errorClass,
+							validClass: validClass,
+							errorID: errorID,
+							settings: settings
+						});
+					}
 				}
+				$this.trigger('validated', validity);
 			},
 
 			/**
