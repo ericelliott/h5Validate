@@ -190,8 +190,9 @@
 					// The pattern attribute must match the whole value, not just a subset:
 					// "...as if it implied a ^(?: at the start of the pattern and a )$ at the end."
 					re = new RegExp('^(?:' + pattern + ')$'),
-					value = ($this.is('[type=checkbox]') || $this.is('[type=radio]')) ?
-							$this.is(':checked') : $this.val(),
+					value = ($this.is('[type=checkbox]')) ? 
+						$this.is(':checked') : (($this.is('[type=radio]')) ? 
+							$this.closest('form').find('input[name=' + $this.attr('name') + ']:checked').length>0 : $this.val()),
 					errorClass = settings.errorClass,
 					validClass = settings.validClass,
 					errorIDbare = $this.attr(settings.errorAttribute) || false, // Get the ID of the error element.
