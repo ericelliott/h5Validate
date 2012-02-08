@@ -259,7 +259,16 @@
 			<div><input type="color" required /></div>
 		</form>
 		</section>
-		
+
+		<section>
+			<h2>Radio button tests</h2>
+			<form id="radio">
+			<input type="radio" name="radio-test" required>1</input>
+			<input type="radio" name="radio-test" class="checkme" required>2</input>
+			<input type="radio" name="radio-test" required>3</input>
+			</form>
+		</section>
+
 		<a href="#run-tests" id="run-tests">Run Tests</a>
 		<h1 id="qunit-header">QUnit Test Suite</h1>  
 			<h2 id="qunit-banner"></h2>  
@@ -284,6 +293,8 @@
 			});
 
 			$('#newTypes').h5Validate();
+
+			$('#radio').h5Validate();
 
 			$('#run-tests').click(function () {
 				runTests();

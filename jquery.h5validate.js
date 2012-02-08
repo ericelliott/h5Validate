@@ -1,9 +1,9 @@
 /**
  * h5Validate
- * @version v0.8.0
+ * @version v0.8.2
  * Using semantic versioning: http://semver.org/
  * @author Eric Hamilton http://ericleads.com/
- * @copyright 2010 - 2011 Eric Hamilton
+ * @copyright 2010 - 2012 Eric Hamilton
  * Dual licensed under the MIT and GPL licenses:
  * http://www.opensource.org/licenses/mit-license.php
  * http://www.gnu.org/licenses/gpl.html
@@ -140,6 +140,7 @@
 				}
 			}
 		},
+
 		// Aliases
 		defaults = h5.defaults,
 		patternLibrary = defaults.patternLibrary,
@@ -159,25 +160,47 @@
 		},
 
 		methods = {
-			isValid: function () {
+			/**
+			 * Check the validity of the current field
+			 * @param  {object}  settings   instance settings
+			 * @param  {object}  options
+			 *			.revalidate - trigger validation function first?
+			 * @return {Boolean}
+			 */
+			isValid: function (settings, options) {
 				var $this = $(this);
 
-				$this.trigger('validate');
+				options = (settings && options) || {};
+
+				// Revalidate defaults to true
+				if (options.revalidate !== false) {
+					$this.trigger('validate');
+				}
 
 				return $this.data('valid'); // get the validation result
 			},
-			allValid: function (settings) {
+			allValid: function (settings, options) {
 				var valid = true,
 					formValidity = [],
-					$this = $(this);
-				$this.find(settings.allValidSelectors).each(function () {
-					var $this = $(this);
-					$this.bind('validated', function (e, data) {
+					$this = $(this),
+					getValidity = function getValidity(e, data) {
 						data.e = e;
 						formValidity.push(data);
-					});
-					valid = $(this).h5Validate('isValid') && valid;
+					};
+
+				options = options || {};
+
+				// Make sure we're not triggering handlers more than we need to.
+				$this.undelegate(settings.allValidSelectors,
+					'.allValid', getValidity);
+				$this.delegate(settings.allValidSelectors,
+					'validated.allValid', getValidity);
+
+				$this.find(settings.allValidSelectors).each(function () {
+					var $this = $(this);
+					valid = $this.h5Validate('isValid', options) && valid;
 				});
+
 				$this.trigger('formValidated', {valid: valid, elements: formValidity});
 				return valid;
 			},
@@ -190,8 +213,11 @@
 					// The pattern attribute must match the whole value, not just a subset:
 					// "...as if it implied a ^(?: at the start of the pattern and a )$ at the end."
 					re = new RegExp('^(?:' + pattern + ')$'),
-					value = ($this.is('[type=checkbox]') || $this.is('[type=radio]')) ?
-							$this.is(':checked') : $this.val(),
+					value = ($this.is('[type=checkbox]')) ?
+							$this.is(':checked') : (($this.is('[type=radio]')) ?
+								$(settings.el)
+									.find('input[name=' + $this.attr('name') + ']:checked')
+									.length > 0 : $this.val()),
 					errorClass = settings.errorClass,
 					validClass = settings.validClass,
 					errorIDbare = $this.attr(settings.errorAttribute) || false, // Get the ID of the error element.
@@ -263,7 +289,7 @@
 			 * @returns {element} The passed element (for method chaining).
 			 */
 			delegateEvents: function (selectors, eventFlags, element, settings) {
-				var events = [],
+				var events = {},
 					key = 0,
 					validate = function () {
 						settings.validate.call(this, settings);
@@ -290,16 +316,19 @@
 			 * @returns {object} jQuery object for chaining.
 			 */
 			bindDelegation: function (settings) {
+				var $this = $(this);
 				// Attach patterns from the library to elements.
+				// **TODO: pattern / validation method matching should
+				// take place inside the validate action.
 				$.each(patternLibrary, function (key, value) {
 					var pattern = value.toString();
 					pattern = pattern.substring(1, pattern.length - 1);
 					$('.' + settings.classPrefix + key).attr('pattern', pattern);
 				});
 
-				$(this).filter('form').attr('novalidate', 'novalidate');
-				$(this).find('form').attr('novalidate', 'novalidate');
-				$(this).parents('form').attr('novalidate', 'novalidate');
+				$this.filter('form').attr('novalidate', 'novalidate');
+				$this.find('form').attr('novalidate', 'novalidate');
+				$this.parents('form').attr('novalidate', 'novalidate');
 
 				return this.each(function () {
 					var kbEvents = {
@@ -333,7 +362,8 @@
 			return $.extend(settings, {
 				activeClass: activeClass,
 				activeClassSelector: '.' + activeClass,
-				requiredClass: settings.classPrefix + settings.requiredClass
+				requiredClass: settings.classPrefix + settings.requiredClass,
+				el: this
 			});
 		},
 
@@ -408,12 +438,13 @@
 			args = [].slice.call(arguments, 0);
 			action = options;
 			args.shift();
-			args = $.merge(args, [settings]);
+			args = $.merge([settings], args);
 
+			// Use settings here so we can plug methods into the instance dynamically?
 			return settings[action].apply(this, args);
 		}
 
-		settings = buildSettings(options);
+		settings = buildSettings.call(this, options);
 		setInstance.call(this, settings);
 
 		// Returning the jQuery object allows for method chaining.

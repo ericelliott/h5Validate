@@ -135,7 +135,23 @@
 			
 		});
 
-		//TODO: Validate radio buttons correctly. (Any checked field satisfies required)
+		// Validate radio buttons correctly. (Any checked field satisfies required)
+		test('Issue #27: Validate radio buttons correctly.', function () {
+			var $radioTest = $('[name="radio-test"]'),
+				isEmptyValid,
+				isCheckedValid,
+				$checkme;
+			isEmptyValid = $radioTest.h5Validate('isValid');
+			$checkme = $('.checkme');
+			ok(!isEmptyValid, 'Radio should be invalid when empty.');
+			$checkme.attr('checked', 'checked');
+			isCheckedValid = $checkme.h5Validate('isValid');
+			ok(isCheckedValid,
+				'Radio should be valid as soon as any one is selected');
+		});
+
+		// Todo: test allValid. Make sure to call it more than once and ensure that
+		// behavior remains consistent.
 	}
 	exports.runTests = runTests;
 }((typeof exports !== 'undefined') ? exports : window));
