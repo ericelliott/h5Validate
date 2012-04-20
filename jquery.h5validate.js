@@ -186,7 +186,8 @@
 					getValidity = function getValidity(e, data) {
 						data.e = e;
 						formValidity.push(data);
-					};
+					},
+					settings = $.extend({}, settings, options); // allow options to override settings
 
 				options = options || {};
 
