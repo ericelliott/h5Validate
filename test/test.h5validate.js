@@ -138,16 +138,32 @@
 		// Validate radio buttons correctly. (Any checked field satisfies required)
 		test('Issue #27: Validate radio buttons correctly.', function () {
 			var $radioTest = $('[name="radio-test"]'),
-				isEmptyValid,
-				isCheckedValid,
+				isEmptyInvalid = true,
+				isCheckedValid = true,
 				$checkme;
-			isEmptyValid = $radioTest.h5Validate('isValid');
+
+			// Perform validation on each of the radio buttons
+			$radioTest.h5Validate('isValid');
+
+			$radioTest.each(function(){
+				// Get validation results without performing validation again
+				isEmptyInvalid = isEmptyInvalid && !$(this).h5Validate('isValid', { revalidate: false });
+			});
+
 			$checkme = $('.checkme');
-			ok(!isEmptyValid, 'Radio should be invalid when empty.');
+			ok(isEmptyInvalid, 'All radio buttons should be invalid when empty.');
 			$checkme.attr('checked', 'checked');
-			isCheckedValid = $checkme.h5Validate('isValid');
+
+			// Call .change() to trigger validation
+			$checkme.change();
+
+			$radioTest.each(function(){
+				// Get validation results without performing validation again
+				isCheckedValid = isCheckedValid && $(this).h5Validate('isValid', { revalidate: false });
+			});
+
 			ok(isCheckedValid,
-				'Radio should be valid as soon as any one is selected');
+				'All radio buttons should be valid as soon as any one is selected');
 		});
 
 		// Todo: test allValid. Make sure to call it more than once and ensure that
