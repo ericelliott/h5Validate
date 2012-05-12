@@ -150,6 +150,58 @@
 				'Radio should be valid as soon as any one is selected');
 		});
 
+		// Validate radio buttons correctly. (Any checked field satisfies required)
+		test('Issue #27: Validate radio buttons correctly (again).', function () {
+			var $form = $('<form />', {
+					id: 'radio-test2-form'
+				}),
+				$radioTest,
+				isEmptyValid = 0,
+				isCheckedValid = 0,
+				$checkme;
+
+			$('<input type="radio" required id="radio-test2-1" name="radio-test2" value="abc123" />')
+				.appendTo($form);
+
+			$('<input type="radio" required id="radio-test2-2" name="radio-test2" value="def456" />')
+				.appendTo($form);
+
+			$('<input type="radio" required id="radio-test2-3" name="radio-test2" value="ghi789" />')
+				.appendTo($form);
+
+			$form
+				.appendTo('body');
+
+			$form.h5Validate();
+
+			$radioTest = $('[name="radio-test2"]', $form);
+
+			equal($radioTest.length, 3, 'Three radio buttons with the same name exist');
+			equal($radioTest.filter(':checked').length, 0, 'None is checked');
+
+			$radioTest.each(function(){
+					isEmptyValid += $(this).h5Validate('isValid', { revalidate: false }) ? 1 : 0;
+				});
+
+			equal(isEmptyValid, 0, 'Radio should be invalid when empty.');
+
+			$checkme = $('#radio-test2-2');
+			$checkme.attr('checked', 'checked');
+			equal($radioTest.filter(':checked').length, 1, 'One is checked');
+			
+			// Trigger change event to trigger validation
+			$checkme.change();
+			
+			$radioTest.each(function(){
+					isCheckedValid += $(this).h5Validate('isValid', { revalidate: false }) ? 1 : 0;
+				});
+
+			equal(isCheckedValid, 3,
+				'Radio should be valid as soon as any one is selected');
+
+			$form.remove();
+		});
+
 		// Todo: test allValid. Make sure to call it more than once and ensure that
 		// behavior remains consistent.
 	}
