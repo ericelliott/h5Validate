@@ -80,16 +80,18 @@
 				patternVar: 'h5-pattern',
 				stripMarkup: true,
 
-				// Validate on submit?
-				// **TODO: This isn't implemented, yet.
+				// Run submit related checks and prevent form submission if any fields are invalid?
 				submit: true,
+
+				// Move focus to the first invalid field on submit?
+				focusFirstInvalidElementOnSubmit: true,
+
+				// When submitting, validate elements that haven't been validated yet?
+				validateOnSubmit: true,
 
 				// Callback stubs
 				invalidCallback: function () {},
 				validCallback: function () {},
-
-				// When submitting, validate elements that haven't been validated yet?
-				validateOnSubmit: true,
 
 				// Elements to validate with allValid (only validating visible elements)
 				allValidSelectors: ':input:visible:not(:button):not(:disabled):not(.novalidate)',
@@ -317,7 +319,8 @@
 			 * @returns {object} jQuery object for chaining.
 			 */
 			bindDelegation: function (settings) {
-				var $this = $(this);
+				var $this = $(this),
+					$forms;
 				// Attach patterns from the library to elements.
 				// **TODO: pattern / validation method matching should
 				// take place inside the validate action.
@@ -327,9 +330,13 @@
 					$('.' + settings.classPrefix + key).attr('pattern', pattern);
 				});
 
-				$this.filter('form').attr('novalidate', 'novalidate');
-				$this.find('form').attr('novalidate', 'novalidate');
-				$this.parents('form').attr('novalidate', 'novalidate');
+				$forms = $this.filter('form')
+						.add($this.find('form'))
+						.add($this.parents('form'));
+
+				$forms
+					.attr('novalidate', 'novalidate')
+					.submit(checkValidityOnSubmitHandler);
 
 				return this.each(function () {
 					var kbEvents = {
@@ -351,6 +358,46 @@
 					settings.delegateEvents(settings.activeClassSelector, activeEvents, this, settings);
 				});
 			}
+		},
+
+		/**
+		 * Event handler for the form submit event.
+		 * When settings.submit is enabled:
+		 *  - prevents submission if any invalid fields are found.
+		 *  - Optionally validates all fields.
+		 *  - Optionally moves focus to the first invalid field.
+		 * 
+		 * @param {object} evt The jQuery Event object as from the submit event. 
+		 * 
+		 * @returns {object} undefined if no validation was done, true if validation passed, false if validation didn't.
+		 */
+		checkValidityOnSubmitHandler = function(evt) {
+
+			var $this,
+				settings = getInstance.call(this),
+				allValid;
+
+			if(settings.submit !== true) {
+				return;
+			}
+
+			$this = $(this);
+			allValid = $this.h5Validate('allValid', { revalidate: settings.validateOnSubmit === true });
+
+			if(allValid !== true) {
+				evt.preventDefault();
+
+				if(settings.focusFirstInvalidElementOnSubmit === true){
+					var $invalid = $(settings.allValidSelectors, $this)
+									.filter(function(index){
+										return $(this).h5Validate('isValid', { revalidate: false }) !== true;
+									});
+
+					$invalid.first().focus();
+				}
+			}
+
+			return allValid;
 		},
 
 		instances = [],
