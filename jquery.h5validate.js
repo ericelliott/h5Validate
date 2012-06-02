@@ -183,6 +183,9 @@
 				var valid = true,
 					formValidity = [],
 					$this = $(this),
+					$allFields,
+					$filteredFields,
+					radioNames = [],
 					getValidity = function getValidity(e, data) {
 						data.e = e;
 						formValidity.push(data);
@@ -197,7 +200,25 @@
 				$this.delegate(settings.allValidSelectors,
 					'validated.allValid', getValidity);
 
-				$this.find(settings.allValidSelectors).each(function () {
+				$allFields = $this.find(settings.allValidSelectors);
+
+				// Filter radio buttons with the same name and keep only one,
+				// since they will be checked as a group by isValid()
+				$filteredFields = $allFields.filter(function(index) {
+					var name;
+
+					if(this.tagName === "INPUT"
+						&& this.type === "radio") {
+						name = this.name;
+						if(radioNames[name] === true) {
+							return false;
+						}
+						radioNames[name] = true;
+					}
+					return true;
+				});
+
+				$filteredFields.each(function () {
 					var $this = $(this);
 					valid = $this.h5Validate('isValid', options) && valid;
 				});

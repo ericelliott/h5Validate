@@ -202,6 +202,40 @@
 			$form.remove();
 		});
 
+		test('Pull request #39: Each radio button is only validated once in allValid', 3, function () {
+			var $form = $('<form />', {
+					id: 'radio-test3-form'
+				}),
+				$radioTest,
+				isEmptyValid = 0,
+				isCheckedValid = 0,
+				$checkme;
+
+			$('<input type="radio" required id="radio-test3-1" name="radio-test3" value="abc123" />')
+				.appendTo($form);
+
+			$('<input type="radio" required id="radio-test3-2" name="radio-test3" value="def456" />')
+				.appendTo($form);
+
+			$('<input type="radio" required id="radio-test3-3" name="radio-test3" value="ghi789" />')
+				.appendTo($form);
+
+			$form
+				.appendTo('body');
+
+			$form.h5Validate();
+
+			$form.on("validated.radio-test3", function(evt, data){
+				ok(evt.target.name === "radio-test3", "Validated a radio button, " + evt.target.id)
+			});
+
+			$form.h5Validate("allValid");
+
+			$form.off(".radio-test3");
+
+			$form.remove();
+		});
+
 		// Todo: test allValid. Make sure to call it more than once and ensure that
 		// behavior remains consistent.
 	}
