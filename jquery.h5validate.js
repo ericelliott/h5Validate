@@ -183,6 +183,9 @@
 				var valid = true,
 					formValidity = [],
 					$this = $(this),
+					$allFields,
+					$filteredFields,
+					radioNames = [],
 					getValidity = function getValidity(e, data) {
 						data.e = e;
 						formValidity.push(data);
@@ -197,7 +200,25 @@
 				$this.delegate(settings.allValidSelectors,
 					'validated.allValid', getValidity);
 
-				$this.find(settings.allValidSelectors).each(function () {
+				$allFields = $this.find(settings.allValidSelectors);
+
+				// Filter radio buttons with the same name and keep only one,
+				// since they will be checked as a group by isValid()
+				$filteredFields = $allFields.filter(function(index) {
+					var name;
+
+					if(this.tagName === "INPUT"
+						&& this.type === "radio") {
+						name = this.name;
+						if(radioNames[name] === true) {
+							return false;
+						}
+						radioNames[name] = true;
+					}
+					return true;
+				});
+
+				$filteredFields.each(function () {
 					var $this = $(this);
 					valid = $this.h5Validate('isValid', options) && valid;
 				});
@@ -214,10 +235,14 @@
 					// The pattern attribute must match the whole value, not just a subset:
 					// "...as if it implied a ^(?: at the start of the pattern and a )$ at the end."
 					re = new RegExp('^(?:' + pattern + ')$'),
+					$radiosWithSameName = null,
 					value = ($this.is('[type=checkbox]')) ?
-							$this.is(':checked') : (($this.is('[type=radio]')) ?
-								$(settings.el)
-									.find('input[name=' + $this.attr('name') + ']:checked')
+							$this.is(':checked') : ($this.is('[type=radio]') ?
+								// Cache all radio buttons (in the same form) with the same name as this one
+								($radiosWithSameName = $this.parents('form')
+									// **TODO: escape the radio buttons' name before using it in the jQuery selector
+									.find('input[name="' + $this.attr('name') + '"]'))
+									.filter(':checked')
 									.length > 0 : $this.val()),
 					errorClass = settings.errorClass,
 					validClass = settings.validClass,
@@ -279,6 +304,21 @@
 					}
 				}
 				$this.trigger('validated', validity);
+
+				// If it's a radio button, also validate the other radio buttons with the same name
+				// (while making sure the call is not recursive)
+				if($radiosWithSameName !== null
+					&& settings.alreadyCheckingRelatedRadioButtons !== true) {
+
+					settings.alreadyCheckingRelatedRadioButtons = true;
+
+					$radiosWithSameName
+						.not($this)
+						.trigger('validate');
+
+					settings.alreadyCheckingRelatedRadioButtons = false;
+
+				}
 			},
 
 			/**
