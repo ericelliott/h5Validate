@@ -9,6 +9,8 @@
  * http://www.gnu.org/licenses/gpl.html
  *
  * Developed under the sponsorship of RootMusic, Zumba Fitness, LLC, and Rese Property Management
+ *
+ * Modified by Olle Johansson 2011-03-02 to support validation functions.
  */
 
 /*global jQuery, window, console */
@@ -42,6 +44,7 @@
 					alphaNumeric: /\w+/,
 					integer: /-?\d+/
 				},
+				methodLibrary: {},
 
 				// The prefix to use for dynamically-created class names.
 				classPrefix: 'h5-',
@@ -144,6 +147,7 @@
 		// Aliases
 		defaults = h5.defaults,
 		patternLibrary = defaults.patternLibrary,
+		methodLibrary = defaults.methodLibrary,
 
 		createValidity = function createValidity(validity) {
 			return $.extend({
@@ -155,9 +159,25 @@
 				tooLong: validity.tooLong || false,
 				typeMismatch: validity.typeMismatch || false,
 				valid: validity.valid || true,
-				valueMissing: validity.valueMissing || false
+				valueMissing: validity.valueMissing || false,
+				customFunction: validity.customFunction || false
 			}, validity);
 		},
+
+	    getValidationFunction = function getValidationFunction($el, pfx) {
+		    var fn, classList;
+			if ($el && $el.attr && $el.attr('class')) {
+				classList = $el.attr('class').split(/\s+/);
+				$.each(classList, function(index, item) {
+			        if (item.indexOf(pfx) === 0) {
+				        var fname = item.replace(RegExp(pfx), '');
+				        if (!fn && methodLibrary[fname]) fn = methodLibrary[fname];
+			        }
+				});
+				return fn;
+			}
+		    return undefined;
+	    },
 
 		methods = {
 			/**
@@ -214,6 +234,7 @@
 					// The pattern attribute must match the whole value, not just a subset:
 					// "...as if it implied a ^(?: at the start of the pattern and a )$ at the end."
 					re = new RegExp('^(?:' + pattern + ')$'),
+					validationFn = getValidationFunction($this, settings.classPrefix),
 					value = ($this.is('[type=checkbox]')) ?
 							$this.is(':checked') : (($this.is('[type=radio]')) ?
 								$(settings.el)
@@ -241,41 +262,41 @@
 				}
 
 				if (settings.debug && window.console) {
-					console.log('Validate called on "' + value + '" with regex "' + re + '". Required: ' + required); // **DEBUG
-					console.log('Regex test: ' + re.test(value) + ', Pattern: ' + pattern); // **DEBUG
+					console.log('Validate called on "' + value + '". Required: ' + required); // **DEBUG
+					if (re && re.test) {
+						console.log('Regex test: ' + re.test(value) + ', Pattern: ' + pattern); // **DEBUG
+					}
+					if (validationFn) {
+						console.log('Using validation function');
+					}
 				}
 
 				if (required && !value) {
 					validity.valid = false;
 					validity.valueMissing = true;
-				} else if (pattern && !re.test(value) && value) {
+				}
+				if (pattern && re.test && !re.test(value) && value) {
 					validity.valid = false;
 					validity.patternMismatch = true;
-				} else {
-					validity.valid = true; // redundant?
-
-					if (!settings.RODom) {
-						settings.markValid({
-							element: this,
-							validity: validity,
-							errorClass: errorClass,
-							validClass: validClass,
-							errorID: errorID,
-							settings: settings
-						});
-					}
 				}
-
-				if (!validity.valid) {
-					if (!settings.RODom) {
-						settings.markInvalid({
-							element: this,
-							validity: validity,
-							errorClass: errorClass,
-							validClass: validClass,
-							errorID: errorID,
-							settings: settings
-						});
+				// TODO: Only supports one validation function.
+				if (validationFn && !validationFn(value, $this, settings)) {
+					validity.valid = false;
+					validity.customFunction = true;
+				}
+				if (!settings.RODom) {
+					var val = {
+						element: this,
+						validity: validity,
+						errorClass: errorClass,
+						validClass: validClass,
+						errorID: errorID,
+						settings: settings
+					};
+					if (validity.valid) {
+						settings.markValid(val);
+					} else {
+						settings.markInvalid(val);
 					}
 				}
 				$this.trigger('validated', validity);
@@ -402,6 +423,46 @@
 				}
 			}
 			return patternLibrary;
+		},
+		/**
+		 * Retrieves a pattern with the given name from the patternLibrary.
+		 * 
+		 * @param {String} name Name of the pattern to retrieve.
+		 * 
+		 * @returns {RegExp} The regular expression matching name.
+		 */
+		getPattern: function (name) {
+			return patternLibrary[name];
+		},
+		/**
+		 * Retrieves a pattern as a string with beginning and end slashes removed.
+		 * 
+		 * @param {String} name Name of the pattern to retrieve.
+		 * 
+		 * @returns {String} The regular expression matching name.
+		 */
+		getPatternString: function (name) {
+			var pat = patternLibrary[name];
+			if (pat) pat = pat.toString().slice(1,-1);
+			return pat;
+		},
+		/**
+		 * Takes a map object of validation names and methods,
+		 * which are added to the methodLibrary.
+		 * 
+		 * @param {Object} methods A map of method names and validation functions.
+		 * 
+		 * @return {Object} methodLibrary The modified method library.
+		 */
+		addMethods: function (methods) {
+			var methodLibrary = defaults.methodLibrary,
+				key;
+			for (key in methods) {
+				if (methods.hasOwnProperty(key)) {
+					methodLibrary[key] = methods[key];
+				}
+			}
+			return methodLibrary;
 		},
 		/**
 		 * Take a valid jQuery selector, and a list of valid values to
