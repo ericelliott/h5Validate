@@ -1,0 +1,36 @@
+{
+  "name": "h5Validate",
+  "version": "0.8.3",
+  "description": "HTML5 form validation",
+  "author": {
+    "name": "Eric Elliott",
+    "url": "http://ericleads.com"
+  },
+  "keywords": [
+    "form",
+    "html5",
+    "form validation",
+    "validation",
+    "jquery"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/dilvie/h5Validate.git"
+  },
+  "directories": {
+    "test": "./test",
+    "lib": "./lib",
+    "scripts": "./scripts",
+    "dist": "./dist"
+  },
+  "dependencies": {
+    "fs-extra": "~0.1.x",
+    "grunt": "~0.3.x"
+  },
+  "devDependencies": {
+    "tap": "~0.2.4"
+  },
+  "engines": {
+    "node": "~0.8.x"
+  }
+}
