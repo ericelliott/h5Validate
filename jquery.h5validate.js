@@ -179,7 +179,7 @@
 
 				return $this.data('valid'); // get the validation result
 			},
-			allValid: function (settings, options) {
+			allValid: function (config, options) {
 				var valid = true,
 					formValidity = [],
 					$this = $(this),
@@ -187,7 +187,7 @@
 						data.e = e;
 						formValidity.push(data);
 					},
-					settings = $.extend({}, settings, options); // allow options to override settings
+					settings = $.extend({}, config, options); // allow options to override settings
 
 				options = options || {};
 
@@ -209,23 +209,34 @@
 				// Get the HTML5 pattern attribute if it exists.
 				// ** TODO: If a pattern class exists, grab the pattern from the patternLibrary, but the pattern attrib should override that value.
 				var $this = $(this),
-					pattern = $this.filter('[pattern]')[0] ? $this.attr('pattern') : false,
+					pattern,
+					re,
+					value,
+					errorClass,
+					validClass,
+					errorIDbare,
+					errorID,
+					required,
+					validity,
+					$checkRequired;
 
-					// The pattern attribute must match the whole value, not just a subset:
-					// "...as if it implied a ^(?: at the start of the pattern and a )$ at the end."
-					re = new RegExp('^(?:' + pattern + ')$'),
-					value = ($this.is('[type=checkbox]')) ?
-							$this.is(':checked') : (($this.is('[type=radio]')) ?
-								$(settings.el)
-									.find('input[name=' + $this.attr('name') + ']:checked')
-									.length > 0 : $this.val()),
-					errorClass = settings.errorClass,
-					validClass = settings.validClass,
-					errorIDbare = $this.attr(settings.errorAttribute) || false, // Get the ID of the error element.
-					errorID = errorIDbare ? '#' + errorIDbare : false, // Add the hash for convenience. This is done in two steps to avoid two attribute lookups.
-					required = false,
-					validity = createValidity({element: this, valid: true}),
-					$checkRequired = $('<input required>');
+				pattern = $this.filter('[pattern]')[0] ? $this.attr('pattern') : false,
+
+				// The pattern attribute must match the whole value, not just a subset:
+				// "...as if it implied a ^(?: at the start of the pattern and a )$ at the end."
+				re = new RegExp('^(?:' + pattern + ')$'),
+				value = ($this.is('[type=checkbox]')) ?
+						$this.is(':checked') : (($this.is('[type=radio]')) ?
+							$(settings.el)
+								.find('input[name=' + $this.attr('name') + ']:checked')
+								.length > 0 : $this.val()),
+				errorClass = settings.errorClass,
+				validClass = settings.validClass,
+				errorIDbare = $this.attr(settings.errorAttribute) || false, // Get the ID of the error element.
+				errorID = errorIDbare ? '#' + errorIDbare.replace(/(:|\.|\[|\])/g,'\\$1') : false, // Add the hash for convenience. This is done in two steps to avoid two attribute lookups.
+				required = false,
+				validity = createValidity({element: this, valid: true}),
+				$checkRequired = $('<input required>');
 
 				/*	If the required attribute exists, set it required to true, unless it's set 'false'.
 				*	This is a minor deviation from the spec, but it seems some browsers have falsey 

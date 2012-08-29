@@ -8,33 +8,25 @@
 		</script>
 -->
 
-		<link href="style01.css" media="screen" rel="stylesheet" type="text/css" />
-		<link href="http://code.jquery.com/qunit/qunit-git.css" rel="stylesheet" />
-		<script type="text/javascript">
+		<link href="../style01.css" media="screen" rel="stylesheet" type="text/css" />
+		<link href="qunit.css" rel="stylesheet" />
 
-		  var _gaq = _gaq || [];
-		  _gaq.push(['_setAccount', 'UA-20667798-1']);
-		  _gaq.push(['_setDomainName', 'none']);
-		  _gaq.push(['_setAllowLinker', true]);
-		  _gaq.push(['_trackPageview']);
-
-		  (function() {
-		    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-		    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-		    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-		  })();
-
-		</script>
 	</head>
 	<body>
+
+		<h1 id="qunit-header">QUnit Test Suite</h1>  
+			<h2 id="qunit-banner"></h2>  
+			<div id="qunit-testrunner-toolbar"></div>  
+			<h2 id="qunit-userAgent"></h2>  
+			<ol id="qunit-tests"></ol>
+
+
 		<header>
 		<h1>h5Validate - HTML5 Form Validation for jQuery</h1>
 
-		<a class="button" href="http://github.com/dilvie/h5Validate/archives/master">Download from Github</a>
 
 		<br /><br />
 		
-		<p>If you want to contribute, feel free to <a href="http://github.com/dilvie/h5Validate">fork the project on Github</a>.</p>
 
 		<p>Best practice realtime HTML5 form validation for jQuery. Works on all popular browsers, including old ones like IE6.</p>
 
@@ -58,7 +50,6 @@
 
 		<p>Copy and paste this at the end of the body on any page with an HTML5 form. If html5 validation rules exist in the form, you're in business!</p>
 
-		<script src="http://gist.github.com/607687.js?file=h5Validate-loader-part.html"></script>
 
 		<h2>Features</h2>
 
@@ -71,9 +62,6 @@
 		<input type="submit" value="Submit" />
 		</form>
 
-		<h4>Source:</h4>
-
-		<script src="http://gist.github.com/607690.js?file=h5-required-demo-part.html"></script>
 
 		<h3>HTMTL5 pattern attribute. e.g.</h3>
 
@@ -84,9 +72,6 @@
 		<p><em>Hint: It's expecting mm/dd/yyyy. Try typing "jQuery rocks!" instead.</em></p>
 
 		
-		<h4>Source:</h4>
-		
-		<script src="http://gist.github.com/607739.js?file=h5-pattern-demo-part.html"></script>
 
 		<h3>Pattern Library</h3>
 		
@@ -99,8 +84,6 @@
 			<input id="email" type="text" class="h5-email" required />
 		</form>
 		
-		<h4>Source:</h4>
-		<script src="https://gist.github.com/814972.js?file=gistfile1.phtml"></script>
 		
 		<h3>Error Messages</h3>
 		
@@ -122,8 +105,6 @@
 		<p><em>Hint: Select it, then click somewhere else without typing anything.</em></p>
 		</form>
 
-		<h4>Source:</h4>
-		<script src="http://gist.github.com/607750.js?file=h5-setting-options-part.html"></script>		 
 		
 		<dl>
 		<dt>errorClass</dt><dd><p>Custom CSS class for validation errors.</p></dd>
@@ -199,15 +180,11 @@
 		<input class="h5-phone" id="phone" name="phone" type="text" placeholder="555-555-5555" title="555-555-5555" />
 		</form>
 				
-		<h3>Source:</h3>
-		
-		<script src="http://gist.github.com/612886.js?file=h5-class-selectors-part.html"></script>		
 
 		<p>The <code>class="h5-phone"</code> bit is the part doing the magic. The <code>h5-</code> prefix tells you that this class is a handle that we can use to attach validation rules to. Internally, we just tack this prefix to the front of the pattern names to get the right selectors.</p>
 
 		<p>In your JavaScript, specify the pattern name <em>without</em> the class prefix. Keeping the prefix off lets us easily share and re-use pattern libraries between projects.</p>
 
-		<script src="http://gist.github.com/612886.js?file=h5-custom-pattern-part.js"></script>
 
 			</dd>
 			<br/>
@@ -269,10 +246,11 @@
 			</form>
 		</section>
 
+
 		<script src="http://code.jquery.com/jquery.js"></script>
-		<script src="jquery.h5validate.js"></script>
-		<script src="http://code.jquery.com/qunit/qunit-git.js"></script>
-		<script src="test/test.h5validate.js"></script>
+		<script src="../jquery.h5validate.js"></script>
+		<script src="qunit.js"></script>
+		<script src="test.h5validate.js"></script>
 
 		<script>
 		$(document).ready(function () {
@@ -289,6 +267,7 @@
 
 			$('#radio').h5Validate();
 
+			runTests();
 		});
 		</script>
 	</body>

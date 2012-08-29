@@ -168,6 +168,24 @@
 
 		// Todo: test allValid. Make sure to call it more than once and ensure that
 		// behavior remains consistent.
+
+		test('Issue #43: data-h5-errorid doesn\'t work with square brackets', function () {
+			var $container = $('<div id="idTestContainer">'),
+				$input = $('<input>', {
+					'id': 'idTestInput',
+					'data-h5-errorid': 'test[0]',
+					'required': 'required'
+				}).appendTo($container),
+				$errorDiv = $('<div id="test[0]" style="display: none;">').appendTo($container);
+
+			$container.appendTo('body');
+			$container.h5Validate();
+
+			$input.h5Validate('isValid');
+			ok($errorDiv.is(':visible'),
+				'Should be able to toggle visibility of divs with square brackets in ' +
+				'the id');
+		});
 	}
 	exports.runTests = runTests;
 }((typeof exports !== 'undefined') ? exports : window));
