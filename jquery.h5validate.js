@@ -218,7 +218,8 @@
 					errorID,
 					required,
 					validity,
-					$checkRequired;
+					$checkRequired,
+					maxlength;
 
 				pattern = $this.filter('[pattern]')[0] ? $this.attr('pattern') : false,
 
@@ -254,6 +255,12 @@
 				if (settings.debug && window.console) {
 					console.log('Validate called on "' + value + '" with regex "' + re + '". Required: ' + required); // **DEBUG
 					console.log('Regex test: ' + re.test(value) + ', Pattern: ' + pattern); // **DEBUG
+				}
+
+				maxlength = $this.attr('maxlength');
+				if (maxlength !== undefined && value.length > maxlength) {
+					validity.valid = false;
+					validity.tooLong = true;
 				}
 
 				if (required && !value) {
@@ -369,11 +376,14 @@
 		buildSettings = function buildSettings(options) {
 			// Combine defaults and options to get current settings.
 			var settings = $.extend({}, defaults, options, methods),
-				activeClass = settings.classPrefix + settings.activeClass;
+				activeClass = settings.classPrefix + settings.activeClass,
+				activeValidationElements = !('maxLength' in document.createElement('textarea'))
+					? ', [maxlength]'
+					: '';
 
 			return $.extend(settings, {
 				activeClass: activeClass,
-				activeClassSelector: '.' + activeClass,
+				activeClassSelector: '.' + activeClass + activeValidationElements,
 				requiredClass: settings.classPrefix + settings.requiredClass,
 				el: this
 			});
