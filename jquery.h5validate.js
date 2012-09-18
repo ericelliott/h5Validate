@@ -257,8 +257,8 @@
 					console.log('Regex test: ' + re.test(value) + ', Pattern: ' + pattern); // **DEBUG
 				}
 
-				maxlength = $this.attr('maxlength');
-				if (maxlength !== undefined && value.length > maxlength) {
+				maxlength = parseInt($this.attr('maxlength'), 10);
+				if (! isNaN(maxlength) && value.length > maxlength) {
 					validity.valid = false;
 					validity.tooLong = true;
 				}
@@ -270,8 +270,6 @@
 					validity.valid = false;
 					validity.patternMismatch = true;
 				} else {
-					validity.valid = true; // redundant?
-
 					if (!settings.RODom) {
 						settings.markValid({
 							element: this,
@@ -367,6 +365,7 @@
 					settings.delegateEvents(settings.kbSelectors, kbEvents, this, settings);
 					settings.delegateEvents(settings.mSelectors, mEvents, this, settings);
 					settings.delegateEvents(settings.activeClassSelector, activeEvents, this, settings);
+					settings.delegateEvents('textarea[maxlength]', {keyup: true}, this, settings);  // @todo I wasn't sure how to name/classify the events, woud it make sense to use the "activeEvents" object?
 				});
 			}
 		},
@@ -376,14 +375,11 @@
 		buildSettings = function buildSettings(options) {
 			// Combine defaults and options to get current settings.
 			var settings = $.extend({}, defaults, options, methods),
-				activeClass = settings.classPrefix + settings.activeClass,
-				activeValidationElements = !('maxLength' in document.createElement('textarea'))
-					? ', [maxlength]'
-					: '';
+				activeClass = settings.classPrefix + settings.activeClass;
 
 			return $.extend(settings, {
 				activeClass: activeClass,
-				activeClassSelector: '.' + activeClass + activeValidationElements,
+				activeClassSelector: '.' + activeClass,
 				requiredClass: settings.classPrefix + settings.requiredClass,
 				el: this
 			});

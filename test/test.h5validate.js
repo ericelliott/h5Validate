@@ -186,6 +186,31 @@
 				'Should be able to toggle visibility of divs with square brackets in ' +
 				'the id');
 		});
+
+
+		test('Issue #44: validation throws an error when the number of characters in a textarea is > maxlength', function () {
+			var $form = $('<form />')
+				, $textarea = $('<textarea />').appendTo($form);
+
+			$form
+				.appendTo('body')
+				.h5Validate();
+
+			$.each([3, 11, 100], function (i, maxlength) {
+				var validStr = new Array(maxlength + 1).join('a'),
+					validLength = validStr.length,
+					invalidStr = new Array (maxlength + 2).join('a'),
+					invalidLength = invalidStr.length;
+
+				$textarea.attr('maxlength', maxlength);
+
+				$textarea.val(validStr).trigger('keyup');
+				ok($textarea.h5Validate('isValid'), 'Textareas with character length = ' + validLength +' and maxlength = ' + maxlength + ' are valid');
+
+				$textarea.val(invalidStr).trigger('keyup');
+				ok(! $textarea.h5Validate('isValid'), 'Textareas with character length = ' + invalidLength + ' than maxlength = ' + maxlength + ' are invalid');
+			});
+		});
 	}
 	exports.runTests = runTests;
 }((typeof exports !== 'undefined') ? exports : window));
