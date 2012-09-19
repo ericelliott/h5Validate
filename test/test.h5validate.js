@@ -86,6 +86,11 @@
 
 			$form.h5Validate();
 
+			$form.bind('formValidate', function (event, data) {
+				ok(data, 'formValidate triggers.');
+				ok(data.settings, 'A copy of the settings is passed.');
+			});
+
 			$input.bind('validated', function (event, data) {
 				ok(data, 'Validated event triggers.');
 				equal(data.element, $input[0], 'Element is correct.');
