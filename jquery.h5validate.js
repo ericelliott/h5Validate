@@ -365,7 +365,7 @@
 					settings.delegateEvents(settings.kbSelectors, kbEvents, this, settings);
 					settings.delegateEvents(settings.mSelectors, mEvents, this, settings);
 					settings.delegateEvents(settings.activeClassSelector, activeEvents, this, settings);
-					settings.delegateEvents('textarea[maxlength]', {keyup: true}, this, settings);  // @todo I wasn't sure how to name/classify the events, woud it make sense to use the "activeEvents" object?
+					settings.delegateEvents('textarea[maxlength]', {keyup: true}, this, settings);
 				});
 			}
 		},
