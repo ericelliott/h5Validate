@@ -218,7 +218,8 @@
 					errorID,
 					required,
 					validity,
-					$checkRequired;
+					$checkRequired,
+					maxlength;
 
 				pattern = $this.filter('[pattern]')[0] ? $this.attr('pattern') : false,
 
@@ -256,6 +257,12 @@
 					console.log('Regex test: ' + re.test(value) + ', Pattern: ' + pattern); // **DEBUG
 				}
 
+				maxlength = parseInt($this.attr('maxlength'), 10);
+				if (! isNaN(maxlength) && value.length > maxlength) {
+					validity.valid = false;
+					validity.tooLong = true;
+				}
+
 				if (required && !value) {
 					validity.valid = false;
 					validity.valueMissing = true;
@@ -263,8 +270,6 @@
 					validity.valid = false;
 					validity.patternMismatch = true;
 				} else {
-					validity.valid = true; // redundant?
-
 					if (!settings.RODom) {
 						settings.markValid({
 							element: this,
@@ -360,6 +365,7 @@
 					settings.delegateEvents(settings.kbSelectors, kbEvents, this, settings);
 					settings.delegateEvents(settings.mSelectors, mEvents, this, settings);
 					settings.delegateEvents(settings.activeClassSelector, activeEvents, this, settings);
+					settings.delegateEvents('textarea[maxlength]', {keyup: true}, this, settings);
 				});
 			}
 		},
