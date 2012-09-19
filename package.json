@@ -27,10 +27,10 @@
     "fs-extra": "~0.1.x",
     "grunt": "~0.3.x"
   },
-  "devDependencies": {
-    "tap": "~0.2.4"
+  "scripts": {
+    "test": "grunt"
   },
   "engines": {
-    "node": "~0.8.x"
+    "node": "~0.x.x"
   }
 }
