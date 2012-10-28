@@ -189,8 +189,8 @@
 
 
 		test('Issue #44: validation throws an error when the number of characters in a textarea is > maxlength', function () {
-			var $form = $('<form />')
-				, $textarea = $('<textarea />').appendTo($form);
+			var $form = $('<form />'),
+				$textarea = $('<textarea />').appendTo($form);
 
 			$form
 				.appendTo('body')
@@ -210,6 +210,33 @@
 				$textarea.val(invalidStr).trigger('keyup');
 				ok(! $textarea.h5Validate('isValid'), 'Textareas with character length = ' + invalidLength + ' than maxlength = ' + maxlength + ' are invalid');
 			});
+		});
+
+		test('Issue #53 number pattern fails when leading zero is omitted ' + 
+				'from decimal value.', function () {
+			var $form = $('<form />'),
+				$num = $('<input type="text" class="h5-number" required="required"></input>')
+					.appendTo($form),
+				validValues = ['.3', '0.3', '9999999.9', '10', '-1', '-2.99'],
+				invalidValues = ['a', '2.x', 'x.2'];
+
+			$form
+				.appendTo('body')
+				.h5Validate();
+
+			validValues.forEach(function (num) {
+				$num.val(num).trigger('keyup');
+				ok($num.h5Validate('isValid'), 
+					'Valid number, ' + num +' should pass validation.');
+			});
+
+			invalidValues.forEach(function (num) {
+				$num.val(num).trigger('keyup');
+				ok(!$num.h5Validate('isValid'), 
+					'Invalid number, ' + num +' should not pass validation.');
+			});
+
+			$form.empty().remove();
 		});
 	}
 	exports.runTests = runTests;
