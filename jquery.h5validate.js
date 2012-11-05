@@ -257,10 +257,6 @@
 					validity = createValidity({element: this, valid: true}),
 					$checkRequired = $('<input required>'),
 					maxlength;
-					
-						if (settings.trimWhitespace == true){
-                    value = $.trim(value);
-                }
 
 				/*	If the required attribute exists, set it required to true, unless it's set 'false'.
 				*	This is a minor deviation from the spec, but it seems some browsers have falsey 
