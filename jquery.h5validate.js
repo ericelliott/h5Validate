@@ -52,6 +52,7 @@
 				requiredClass: 'required',
 				requiredAttribute: 'required',
 				patternAttribute: 'pattern',
+				trimWhitespace: false,
 
 				// Attribute which stores the ID of the error container element (without the hash).
 				errorAttribute: 'data-h5-errorid',
@@ -247,7 +248,7 @@
 									// **TODO: escape the radio buttons' name before using it in the jQuery selector
 									.find('input[name="' + $this.attr('name') + '"]'))
 									.filter(':checked')
-									.length > 0 : $this.val()),
+									.length > 0 : (settings.trimWhitespace) ? $this.val().trim() : $this.val()),
 					errorClass = settings.errorClass,
 					validClass = settings.validClass,
 					errorIDbare = $this.attr(settings.errorAttribute) || false, // Get the ID of the error element.
@@ -256,6 +257,10 @@
 					validity = createValidity({element: this, valid: true}),
 					$checkRequired = $('<input required>'),
 					maxlength;
+					
+						if (settings.trimWhitespace == true){
+                    value = $.trim(value);
+                }
 
 				/*	If the required attribute exists, set it required to true, unless it's set 'false'.
 				*	This is a minor deviation from the spec, but it seems some browsers have falsey 
