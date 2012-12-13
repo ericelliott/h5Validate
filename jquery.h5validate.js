@@ -476,11 +476,6 @@
 				}
 				$(form).trigger('instance', { 'data-h5-instanceId': instanceId });
 			});
-			/*var instanceId = instances.push(settings) - 1;
-			if (settings.RODom !== true) {
-				$(this).attr('data-h5-instanceId', instanceId);
-			}
-			$(this).trigger('instance', { 'data-h5-instanceId': instanceId });*/
 		};
 
 	$.h5Validate = {
@@ -526,7 +521,11 @@
 			}
 			re = new RegExp('^(?:' + pattern + ')$');
 			$(selector).data('regex', re);
-		}
+		},
+		/**
+		* Instances collection. 
+		*/
+		instances: instances
 	};
 
 	$.fn.h5Validate = function h5Validate(options) {

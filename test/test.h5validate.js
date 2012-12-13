@@ -238,6 +238,18 @@
 
 			$form.empty().remove();
 		});
+
+		test('Issue #%% Multiple forms in selector result should receive separate instance IDs.', function(){
+			var form1 = $('<form/>', {id: "multi-form-1", "class": "multi-form"}),
+				form2 = $('<form/>', {id: "multi-form-2", "class": "multi-form"}),
+				currentInstances = $.h5Validate.instances.length,
+				addedInstances = 0;
+			form1.appendTo('body');
+			form2.appendTo('body');
+			$('form.multi-form').h5Validate();
+			addedInstances = $.h5Validate.instances.length;
+			equal(addedInstances-currentInstances, 2, "Should have 2 more instances");
+		});
 	}
 	exports.runTests = runTests;
 }((typeof exports !== 'undefined') ? exports : window));
