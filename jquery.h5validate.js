@@ -469,11 +469,18 @@
 		},
 
 		setInstance = function setInstance(settings) {
-			var instanceId = instances.push(settings) - 1;
+			this.each(function(index, form){
+				var instanceId = instances.push(settings) - 1;
+				if (settings.RODom !== true) {
+					$(form).attr('data-h5-instanceId', instanceId);
+				}
+				$(form).trigger('instance', { 'data-h5-instanceId': instanceId });
+			});
+			/*var instanceId = instances.push(settings) - 1;
 			if (settings.RODom !== true) {
 				$(this).attr('data-h5-instanceId', instanceId);
 			}
-			$(this).trigger('instance', { 'data-h5-instanceId': instanceId });
+			$(this).trigger('instance', { 'data-h5-instanceId': instanceId });*/
 		};
 
 	$.h5Validate = {
