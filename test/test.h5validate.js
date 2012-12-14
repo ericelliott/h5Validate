@@ -26,6 +26,14 @@
 			ok((!$input.h5Validate('isValid')), 'Input should be invalid when given invalid input.');
 		});
 
+		test('Pattern data- attribute', function(){
+			var $input = $('#dataAttr');
+			$input.val('test@example.com');
+			ok(($input.h5Validate('isValid')), 'Input should be valid when given a valid input');
+			$input.val('notanemail');
+			ok(!($input.h5Validate('isValid')), 'Input should not be valid when given bad data');
+		});
+
 		test('Pattern library:', function () {
 			var $input = $('#email');
 			$input.val('test@example.com');

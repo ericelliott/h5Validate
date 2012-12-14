@@ -83,6 +83,13 @@
 			<label for="email">Email:</label>
 			<input id="email" type="text" class="h5-email" required />
 		</form>
+
+		<p>Another option to use the patterns from within the Pattern Library is to declare them with custom data attributes. The prefix will be <code>data-</code> plus the patternVar from the settings (it's <code>data-h5-pattern</code> by default).</p>
+		
+		<form class="h5-defaults">
+			<label for="dataAttr">Email:</label>
+			<input id="dataAttr" type="text" data-h5-pattern="email" />
+		</form>
 		
 		
 		<h3>Error Messages</h3>
