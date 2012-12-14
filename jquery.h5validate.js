@@ -235,7 +235,9 @@
 				// ** TODO: If a pattern class exists, grab the pattern from the patternLibrary, but the pattern attrib should override that value.
 				var $this = $(this),
 					pattern = $this.filter('[pattern]')[0] ? $this.attr('pattern') : false,
-
+					// Optionally patterns can be placed in custom data attributes vs. class attr
+					dataPattern = $this.attr('data-' + settings.patternVar),
+					libraryPattern = patternLibrary[dataPattern],
 					// The pattern attribute must match the whole value, not just a subset:
 					// "...as if it implied a ^(?: at the start of the pattern and a )$ at the end."
 					re = new RegExp('^(?:' + pattern + ')$'),
@@ -284,6 +286,9 @@
 				if (required && !value) {
 					validity.valid = false;
 					validity.valueMissing = true;
+				} else if(dataPattern && !libraryPattern.test(value) && value) {
+					validity.valid = false;
+					validity.patternMismatch = true;
 				} else if (pattern && !re.test(value) && value) {
 					validity.valid = false;
 					validity.patternMismatch = true;
@@ -469,11 +474,13 @@
 		},
 
 		setInstance = function setInstance(settings) {
-			var instanceId = instances.push(settings) - 1;
-			if (settings.RODom !== true) {
-				$(this).attr('data-h5-instanceId', instanceId);
-			}
-			$(this).trigger('instance', { 'data-h5-instanceId': instanceId });
+			this.each(function(index, form){
+				var instanceId = instances.push(settings) - 1;
+				if (settings.RODom !== true) {
+					$(form).attr('data-h5-instanceId', instanceId);
+				}
+				$(form).trigger('instance', { 'data-h5-instanceId': instanceId });
+			});
 		};
 
 	$.h5Validate = {
@@ -519,7 +526,11 @@
 			}
 			re = new RegExp('^(?:' + pattern + ')$');
 			$(selector).data('regex', re);
-		}
+		},
+		/**
+		* Instances collection. 
+		*/
+		instances: instances
 	};
 
 	$.fn.h5Validate = function h5Validate(options) {

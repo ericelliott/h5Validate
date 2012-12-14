@@ -26,6 +26,14 @@
 			ok((!$input.h5Validate('isValid')), 'Input should be invalid when given invalid input.');
 		});
 
+		test('Pattern data- attribute', function(){
+			var $input = $('#dataAttr');
+			$input.val('test@example.com');
+			ok(($input.h5Validate('isValid')), 'Input should be valid when given a valid input');
+			$input.val('notanemail');
+			ok(!($input.h5Validate('isValid')), 'Input should not be valid when given bad data');
+		});
+
 		test('Pattern library:', function () {
 			var $input = $('#email');
 			$input.val('test@example.com');
@@ -237,6 +245,18 @@
 			});
 
 			$form.empty().remove();
+		});
+
+		test('Issue #%% Multiple forms in selector result should receive separate instance IDs.', function(){
+			var form1 = $('<form/>', {id: "multi-form-1", "class": "multi-form"}),
+				form2 = $('<form/>', {id: "multi-form-2", "class": "multi-form"}),
+				currentInstances = $.h5Validate.instances.length,
+				addedInstances = 0;
+			form1.appendTo('body');
+			form2.appendTo('body');
+			$('form.multi-form').h5Validate();
+			addedInstances = $.h5Validate.instances.length;
+			equal(addedInstances-currentInstances, 2, "Should have 2 more instances");
 		});
 	}
 	exports.runTests = runTests;
