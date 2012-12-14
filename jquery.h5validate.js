@@ -236,7 +236,7 @@
 				var $this = $(this),
 					pattern = $this.filter('[pattern]')[0] ? $this.attr('pattern') : false,
 					// Optionally patterns can be placed in custom data attributes vs. class attr
-					dataPattern = $this.attr('data-' + defaults.patternVar),
+					dataPattern = $this.attr('data-' + settings.patternVar),
 					libraryPattern = patternLibrary[dataPattern],
 					// The pattern attribute must match the whole value, not just a subset:
 					// "...as if it implied a ^(?: at the start of the pattern and a )$ at the end."
