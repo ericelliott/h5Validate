@@ -238,6 +238,52 @@
 
 			$form.empty().remove();
 		});
+		
+		test('Pull Request #64-1 - blank formnovalidate attribute bypassing validation.',function () {
+			var $form = $("#bypassValidation1");
+			var $normalSubmission = $("form#bypassValidation1 :input[id=normalSubmit]");
+			var $bypassSubmission = $("form#bypassValidation1 :input[id=bypassSubmit]");
+
+			$form.h5Validate();
+			
+			var counter = 0;
+			$form.bind('formValidated', function(event, validity) {
+				counter++;
+			});
+			
+			$form.submit(function (event){
+				// don't allow an actual submission
+				event.stopImmediatePropagation();
+				return false;
+			});
+			
+			$normalSubmission.click();
+			$bypassSubmission.click();
+			equal(counter, 1, "validation occured once, formnovalidate buttons bypassed validation.");
+		});
+		
+		test('Pull Request #64-2 - populated formnovalidate attribute bypassing validation.',function () {
+			var $form = $("#bypassValidation2");
+			var $normalSubmission = $("form#bypassValidation2 :input[id=normalSubmit]");
+			var $bypassSubmission = $("form#bypassValidation2 :input[id=bypassSubmit]");
+
+			$form.h5Validate();
+			
+			var counter = 0;
+			$form.bind('formValidated', function(event, validity) {
+				counter++;
+			});
+			
+			$form.submit(function (event){
+				// don't allow an actual submission
+				event.stopImmediatePropagation();
+				return false;
+			});
+			
+			$normalSubmission.click();
+			$bypassSubmission.click();
+			equal(counter, 1, "validation occured once, formnovalidate buttons bypassed validation.");
+		});
 	}
 	exports.runTests = runTests;
 }((typeof exports !== 'undefined') ? exports : window));
