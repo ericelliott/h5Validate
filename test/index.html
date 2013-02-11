@@ -245,6 +245,20 @@
 			<input type="radio" name="radio-test" required>3</input>
 			</form>
 		</section>
+		
+		<section>
+			<h2>Bypassing Validation tests (via 'formnovalidate')</h2>
+			<form id="bypassValidation1">
+				<input id="badInput" type="text" required/>
+				<input id="normalSubmit" type="submit" value="submit"/>
+				<input id="bypassSubmit" type="submit" formnovalidate/>
+			</form>
+			<form id="bypassValidation2">
+				<input id="badInput" type="text" required/>
+				<input id="normalSubmit" type="submit" value="submit"/>
+				<input id="bypassSubmit" type="submit" formnovalidate="formnovalidate"/>
+			</form>
+		</section>
 
 
 		<script src="http://code.jquery.com/jquery.js"></script>
