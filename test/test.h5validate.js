@@ -166,9 +166,6 @@
 				'All radio buttons should be valid as soon as any one is selected');
 		});
 
-		// Todo: test allValid. Make sure to call it more than once and ensure that
-		// behavior remains consistent.
-
 		test('Issue #43: data-h5-errorid doesn\'t work with square brackets', function () {
 			var $container = $('<div id="idTestContainer">'),
 				$input = $('<input>', {
@@ -218,23 +215,27 @@
 				$num = $('<input type="text" class="h5-number" required="required"></input>')
 					.appendTo($form),
 				validValues = ['.3', '0.3', '9999999.9', '10', '-1', '-2.99'],
-				invalidValues = ['a', '2.x', 'x.2'];
+				invalidValues = ['a', '2.x', 'x.2'],
+				i = validValues.length,
+				j = invalidValues.length;
 
 			$form
 				.appendTo('body')
 				.h5Validate();
 
-			validValues.forEach(function (num) {
-				$num.val(num).trigger('keyup');
+			while (i) {
+				$num.val(i).trigger('keyup');
 				ok($num.h5Validate('isValid'),
-					'Valid number, ' + num +' should pass validation.');
-			});
+					'Valid number, ' + i +' should pass validation.');
+				i--;
+			};
 
-			invalidValues.forEach(function (num) {
-				$num.val(num).trigger('keyup');
+			while (i) {
+				$num.val(i).trigger('keyup');
 				ok(!$num.h5Validate('isValid'),
-					'Invalid number, ' + num +' should not pass validation.');
-			});
+					'Invalid number, ' + i +' should not pass validation.');
+				i--;
+			};
 
 			$form.empty().remove();
 		});
