@@ -132,7 +132,7 @@
 			$form.h5Validate();
 
 			ok($form.h5Validate('allValid'), '.novalidate fields get skipped.');
-			
+
 		});
 
 		// Validate radio buttons correctly. (Any checked field satisfies required)
@@ -212,7 +212,7 @@
 			});
 		});
 
-		test('Issue #53 number pattern fails when leading zero is omitted ' + 
+		test('Issue #53 number pattern fails when leading zero is omitted ' +
 				'from decimal value.', function () {
 			var $form = $('<form />'),
 				$num = $('<input type="text" class="h5-number" required="required"></input>')
@@ -226,64 +226,45 @@
 
 			validValues.forEach(function (num) {
 				$num.val(num).trigger('keyup');
-				ok($num.h5Validate('isValid'), 
+				ok($num.h5Validate('isValid'),
 					'Valid number, ' + num +' should pass validation.');
 			});
 
 			invalidValues.forEach(function (num) {
 				$num.val(num).trigger('keyup');
-				ok(!$num.h5Validate('isValid'), 
+				ok(!$num.h5Validate('isValid'),
 					'Invalid number, ' + num +' should not pass validation.');
 			});
 
 			$form.empty().remove();
 		});
-		
-		test('Pull Request #64-1 - blank formnovalidate attribute bypassing validation.',function () {
+
+		test('Pull Request #64 formnovalidate attribute',function () {
 			var $form = $("#bypassValidation1");
-			var $normalSubmission = $("form#bypassValidation1 :input[id=normalSubmit]");
-			var $bypassSubmission = $("form#bypassValidation1 :input[id=bypassSubmit]");
+			var $bypassSubmission = $("form#bypassValidation1 :input[id=bypassSubmit]"),
+				validated = false;
 
 			$form.h5Validate();
-			
-			var counter = 0;
+
 			$form.bind('formValidated', function(event, validity) {
-				counter++;
+				validated = true;
+				ok(false,
+					'Form with `formnovalidate` should not be validated.');
 			});
-			
+
 			$form.submit(function (event){
 				// don't allow an actual submission
 				event.stopImmediatePropagation();
 				return false;
 			});
-			
-			$normalSubmission.click();
-			$bypassSubmission.click();
-			equal(counter, 1, "validation occured once, formnovalidate buttons bypassed validation.");
-		});
-		
-		test('Pull Request #64-2 - populated formnovalidate attribute bypassing validation.',function () {
-			var $form = $("#bypassValidation2");
-			var $normalSubmission = $("form#bypassValidation2 :input[id=normalSubmit]");
-			var $bypassSubmission = $("form#bypassValidation2 :input[id=bypassSubmit]");
 
-			$form.h5Validate();
-			
-			var counter = 0;
-			$form.bind('formValidated', function(event, validity) {
-				counter++;
-			});
-			
-			$form.submit(function (event){
-				// don't allow an actual submission
-				event.stopImmediatePropagation();
-				return false;
-			});
-			
-			$normalSubmission.click();
 			$bypassSubmission.click();
-			equal(counter, 1, "validation occured once, formnovalidate buttons bypassed validation.");
+			equal(validated, false,
+				'Form with `formnovalidate` should not be validated.');
+
+			$form.empty().remove();
 		});
+
 	}
 	exports.runTests = runTests;
 }((typeof exports !== 'undefined') ? exports : window));
