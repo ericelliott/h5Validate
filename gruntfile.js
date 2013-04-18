@@ -4,10 +4,8 @@ module.exports = function(grunt) {
   'use strict';
   grunt.initConfig({
     pkg: '<json:package.json>',
-    lint: {
-      all: ['./grunt.js', './dist/*.js', './test/test.js']
-    },
     jshint: {
+      all: ['./gruntfile.js', './dist/*.js', './test/test.h5validate.js'],
       options: {
         curly: true,
         eqeqeq: true,
@@ -26,8 +24,12 @@ module.exports = function(grunt) {
       }
     },
 
-    server: {
-      port: process.env.sauceport
+    connect: {
+      server: {
+        options: {
+          port: process.env.sauceport
+        }
+      }
     },
 
     'saucelabs-qunit': {
@@ -69,8 +71,10 @@ module.exports = function(grunt) {
     }
   });
   console.log(process.env.sauceuser);
+  grunt.loadNpmTasks('grunt-contrib-jshint');
+  grunt.loadNpmTasks('grunt-contrib-connect');
   grunt.loadNpmTasks('grunt-saucelabs');
 
-  grunt.registerTask('default', 'lint');
-  grunt.registerTask('test', 'lint server saucelabs-qunit');
+  grunt.registerTask('default', 'jshint');
+  grunt.registerTask('test', ['jshint', 'connect:server', 'saucelabs-qunit']);
 };
