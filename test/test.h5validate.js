@@ -267,6 +267,40 @@
 
       $form.empty().remove();
     });
+	
+    test('u01jmg3 Pull Request telephone number regex updated', function () {
+      var $form = $('<form />'),
+        $tel = $('<input type="tel" class="h5-phone" required="required"></input>')
+          .appendTo($form),
+        validValues = ['+441224271234', '+44 (0)1224 271234', '+44 (01224) 27-12-34', '+44 (01224) 27.12.34', 
+		'(01224) 271234 Extension: 1234', '(0)1224 271234 ex 5555'],
+        invalidValues = ['44 (01224) 271234', '01224 271234 (x4444)', '(+44)1224 271234', '(01224) 271234 Extension: #123'],
+        i = validValues.length,
+        j = invalidValues.length,
+        val;
+
+      $form
+        .appendTo('body')
+        .h5Validate();
+
+      while (i) {
+        val = validValues[i-1];
+        $tel.val(val).trigger('keyup');
+        ok($tel.h5Validate('isValid'),
+          'Valid telephone number, ' + val +' should pass validation.');
+        i--;
+      }
+
+      while (j) {
+        val = invalidValues[j-1];
+        $tel.val(val).trigger('keyup');
+        ok(!$tel.h5Validate('isValid'),
+          'Invalid telephone number, ' + val +' should not pass validation.');
+        j--;
+      }
+
+      $form.empty().remove();
+    });	
 
   }
   exports.runTests = runTests;
