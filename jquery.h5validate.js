@@ -92,6 +92,9 @@
 				// Callback stubs
 				invalidCallback: function () {},
 				validCallback: function () {},
+				
+				// Array of External Validator Functions. View the comment for addExternalValidator for more information.
+				externalValidators: [],
 
 				// Elements to validate with allValid (only validating visible elements)
 				allValidSelectors: ':input:visible:not(:button):not(:disabled):not(.novalidate)',
@@ -279,6 +282,19 @@
 				if (!isNaN(maxlength) && value.length > maxlength) {
 						validity.valid = false;	
 						validity.tooLong = true;
+				}
+				
+				// Iterate through the external validators. If any fail, the field fails.
+				for (var i = 0;i<settings.externalValidators.length;i++) {
+					var validator = settings.externalValidators[i].validator;
+					var selector = settings.externalValidators[i].selector;
+					if ($(this).is(selector)) {
+						var boundValidator = validator.bind(this);
+						if (!boundValidator(value)) {
+							validity.valid = false;	
+							validity.failedExternalValidation = true;
+						}
+					}
 				}
 
 				if (required && !value) {
@@ -523,6 +539,27 @@
 			}
 			re = new RegExp('^(?:' + pattern + ')$');
 			$(selector).data('regex', re);
+		},
+		/**
+		 * Takes a selector and a function that is used to do external validation of all fields.
+		 * This is useful for doing validation against a webservice
+		 * (e.g. 'http://example.com/is_value_valid/example_value')
+		 * Each validator will be matched using the corresponding selector against every field attached to h5Validate.
+		 * 
+		 * @param {Selector} selector - A jquery selector of the field on which to apply the external validator.
+		 *		example: [name="target-field"]
+		 * @param {Function} validator - An external validator function with the following definition:
+		 *		@param {String} value - The value of the input being validated.
+		 *		@return {Boolean} - the result of the validation (true = pass, false = fail)
+		 *		@this {DOM Element} - The dom element being validated. 
+		 */
+		addExternalValidator: function(selector, validator) {
+			if (!$.isFunction(validator)) {
+				console.log("External validators should be functions. You, on the other hand, tried to add the following as a validator:",validator);
+				return false;
+			}
+			defaults.externalValidators.push({selector: selector, validator: validator} );
+			return true;
 		}
 	};
 
