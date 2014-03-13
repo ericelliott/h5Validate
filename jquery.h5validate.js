@@ -550,8 +550,9 @@
 		 *		example: [name="target-field"]
 		 * @param {Function} validator - An external validator function with the following definition:
 		 *		@param {String} value - The value of the input being validated.
-		 *		@return {Boolean} - the result of the validation (true = pass, false = fail)
+		 *		@return {Boolean} - The result of the validation (true = pass, false = fail).
 		 *		@this {DOM Element} - The dom element being validated. 
+		 * @return {Boolean} - Whether the selector was added successfully
 		 */
 		addExternalValidator: function(selector, validator) {
 			if (!$.isFunction(validator)) {
