@@ -93,7 +93,7 @@
 				invalidCallback: function () {},
 				validCallback: function () {},
 				
-				// Array of External Validator Functions. View the comment for addExternalValidator for more information.
+				// Array of External Validator Functions. View the comment for addValidator for more information.
 				externalValidators: [],
 
 				// Elements to validate with allValid (only validating visible elements)
@@ -288,11 +288,15 @@
 				for (var i = 0;i<settings.externalValidators.length;i++) {
 					var validator = settings.externalValidators[i].validator;
 					var selector = settings.externalValidators[i].selector;
+					var options = settings.externalValidators[i].options;
 					if ($(this).is(selector)) {
 						var boundValidator = validator.bind(this);
 						if (!boundValidator(value)) {
 							validity.valid = false;	
-							validity.failedExternalValidation = true;
+							validity.failedValidator = true;
+							if (options.name) {
+								validity.failedValidatorName = options.name;
+							}
 						}
 					}
 				}
@@ -552,15 +556,13 @@
 		 *		@param {String} value - The value of the input being validated.
 		 *		@return {Boolean} - The result of the validation (true = pass, false = fail).
 		 *		@this {DOM Element} - The dom element being validated. 
-		 * @return {Boolean} - Whether the selector was added successfully
+		 * @throws {Error} - If the validator is not a function, throw an exception
 		 */
-		addExternalValidator: function(selector, validator) {
+		addValidator: function(selector, validator, options) {
 			if (!$.isFunction(validator)) {
-				console.log("External validators should be functions. You, on the other hand, tried to add the following as a validator:",validator);
-				return false;
+				throw new Error('Expected external validator function. Saw ', validator);
 			}
-			defaults.externalValidators.push({selector: selector, validator: validator} );
-			return true;
+			defaults.externalValidators.push({selector: selector, validator: validator, options: options || {}} );
 		}
 	};
 

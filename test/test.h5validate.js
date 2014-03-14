@@ -302,89 +302,127 @@
       $form.empty().remove();
     });	
 
-    test('Adding an external validator should fail for non functions',function () {
-	var result = $.h5Validate.addExternalValidator('[name="target-field"]',5);
-	equal(result, false, 'Should not be able to add an integer as an external validator.');
+	test('Adding an external validator should fail for non functions',function () {
+		raises(function() {
+			$.h5Validate.addValidator('[name="target-field"]',5);
+		}, Error, 'Should not be able to add an integer as an external validator.');
 
-	var result = $.h5Validate.addExternalValidator('[name="target-field"]','5');
-	equal(result, false, 'Should not be able to add a string as an external validator.');
+		raises(function() {
+			$.h5Validate.addValidator('[name="target-field"]','5');
+		}, Error, 'Should not be able to add a string as an external validator.');
 
-	var result = $.h5Validate.addExternalValidator('[name="target-field"]',null);
-	equal(result, false, 'Should not be able to add a null as an external validator.');
+		raises(function() {
+			$.h5Validate.addValidator('[name="target-field"]',null);
+		}, Error, 'Should not be able to add a null as an external validator.');
 
-	var result = $.h5Validate.addExternalValidator('[name="target-field"]',{});
-	equal(result, false, 'Should not be able to add an object as an external validator.');
+		raises(function() {
+			$.h5Validate.addValidator('[name="target-field"]',{});
+		}, Error, 'Should not be able to add an object as an external validator.');
 
-	var result = $.h5Validate.addExternalValidator('[name="target-field"]',[]);
-	equal(result, false, 'Should not be able to add an array as an external validator.');
-    });
-
-    test('Adding an external validator should succeed for functions',function () {
-	var result = $.h5Validate.addExternalValidator('[name="target-field"]',function(){return true;});
-	equal(result, true, 'Should be able to add a function as an external validator.');
-    });
-
-    test('Adding an external validator that returns true should not cause validation to fail.',function () {
-	var $form = $('#externalValidationForm'),
-		$field = $('#externalValidationFieldPass');
-	$.h5Validate.addExternalValidator($field,function(){return true;});
-	$form.h5Validate();
-	equal($field.h5Validate('isValid'), true, 'Adding an external validator that returns true should not cause validation to fail.');
-    });
-
-    test('Adding an external validator that returns false should cause validation to fail.',function () {
-	var $form = $('#externalValidationForm'),
-		$field = $('#externalValidationFieldFail');
-	$.h5Validate.addExternalValidator($field,function(){return false;});
-	$form.h5Validate();
-	equal($field.h5Validate('isValid'), false, 'Adding an external validator that returns false should cause validation to fail.');
-    });
-
-    test('Adding an external validator that confirms the value of the input should not cause validation to fail.',function () {
-	var $form = $('#externalValidationForm'),
-		$field = $('#externalValidationFieldExample');
-	$.h5Validate.addExternalValidator($field,function(value){return value == 'example';});
-	$form.h5Validate();
-	equal($field.h5Validate('isValid'), true, 'Adding an external validator that confirms the value of the input should not cause validation to fail.');
-    });
-
-    test('Adding an external validator that disconfirms the value of the input should cause validation to fail.',function () {
-	var $form = $('#externalValidationForm'),
-		$field = $('#externalValidationFieldNotExample');
-	$.h5Validate.addExternalValidator($field,function(value){return value == 'example';});
-	$form.h5Validate();
-	equal($field.h5Validate('isValid'), false, 'Adding an external validator that disconfirms the value of the input should cause validation to fail.');
-    });
-
-    test('Adding an external validator to a selector that does not exist should not cause validation to fail.',function () {
-	var $form = $('#externalValidationFormPass');
-	$.h5Validate.addExternalValidator('atagthatdoesntexistinhtml',function(){return false;});
-	$form.h5Validate();
-	equal($form.h5Validate('allValid'), true, 'Adding an external validator to a selector that does not exist should not cause validation to fail.');
-    });
-
-    test('External validators should be passed the value of the DOM element.',function () {
-	var $form = $('#externalValidationForm'),
-		$field = $('#externalValidationFieldExample');
-	$.h5Validate.addExternalValidator($field,function(value) {
-		equal(value, $field.val(), 'External validators should be passed the value of the DOM element.');
-		return true;
+		raises(function() {
+			$.h5Validate.addValidator('[name="target-field"]',[]);
+		}, Error, 'Should not be able to add an array as an external validator.');
 	});
-	$form.h5Validate();
-	$field.h5Validate('isValid');
-    });
 
-    test('External validators should be run in the context of the DOM element of the target field.',function () {
-	var $form = $('#externalValidationForm'),
-		$field = $('#externalValidationFieldExample');
-	$.h5Validate.addExternalValidator($field,function() {
-		equal(this, $field.get(0), 'External validators should be run in the context of the DOM element of the target field.');
-		return true;
+	test('Adding an external validator should succeed for functions',function () {
+		$.h5Validate.addValidator('[name="target-field"]',function(){return true;});
+		ok(true, 'Should be able to add a function as an external validator without causing an exception.');
 	});
-	$form.h5Validate();
-	$field.h5Validate('isValid');
-    });
 
+	test('Adding an external validator that returns true should not cause validation to fail.',function () {
+		var $form = $('#externalValidationForm'),
+			$field = $('#externalValidationFieldPass');
+		$.h5Validate.addValidator($field,function(){return true;});
+		$form.h5Validate();
+		equal($field.h5Validate('isValid'), true, 'Adding an external validator that returns true should not cause validation to fail.');
+	});
+
+	test('Adding an external validator that returns false should cause validation to fail.',function () {
+		var $form = $('#externalValidationForm'),
+			$field = $('#externalValidationFieldFail');
+		$.h5Validate.addValidator($field,function(){return false;});
+		$form.h5Validate();
+		equal($field.h5Validate('isValid'), false, 'Adding an external validator that returns false should cause validation to fail.');
+	});
+
+	test('Adding an external validator that confirms the value of the input should not cause validation to fail.',function () {
+		var $form = $('#externalValidationForm'),
+			$field = $('#externalValidationFieldExample');
+		$.h5Validate.addValidator($field,function(value){return value == 'example';});
+		$form.h5Validate();
+		equal($field.h5Validate('isValid'), true, 'Adding an external validator that confirms the value of the input should not cause validation to fail.');
+	});
+
+	test('Adding an external validator that disconfirms the value of the input should cause validation to fail.',function () {
+		var $form = $('#externalValidationForm'),
+			$field = $('#externalValidationFieldNotExample');
+		$.h5Validate.addValidator($field,function(value){return value == 'example';});
+		$form.h5Validate();
+		equal($field.h5Validate('isValid'), false, 'Adding an external validator that disconfirms the value of the input should cause validation to fail.');
+	});
+
+	test('Adding an external validator to a selector that does not exist should not cause validation to fail.',function () {
+		var $form = $('#externalValidationFormPass');
+		$.h5Validate.addValidator('atagthatdoesntexistinhtml',function(){return false;});
+		$form.h5Validate();
+		equal($form.h5Validate('allValid'), true, 'Adding an external validator to a selector that does not exist should not cause validation to fail.');
+	});
+
+	test('External validators should be passed the value of the DOM element.',function () {
+		var $form = $('#externalValidationForm'),
+			$field = $('#externalValidationFieldExample');
+		$.h5Validate.addValidator($field,function(value) {
+			equal(value, $field.val(), 'External validators should be passed the value of the DOM element.');
+			return true;
+		});
+		$form.h5Validate();
+		$field.h5Validate('isValid');
+	});
+
+	test('External validators should be run in the context of the DOM element of the target field.',function () {
+		var $form = $('#externalValidationForm'),
+			$field = $('#externalValidationFieldExample');
+		$.h5Validate.addValidator($field,function() {
+			equal(this, $field.get(0), 'External validators should be run in the context of the DOM element of the target field.');
+			return true;
+		});
+		$form.h5Validate();
+		$field.h5Validate('isValid');
+	});
+
+	test('If an added validator fails, the validity "failedValidator" field should be true.',function () {
+		var $form = $('#externalValidationForm'),
+			$field = $('#externalValidationFieldNotExampleNotNamed');
+		$.h5Validate.addValidator($field,function(value){return value == 'example';});
+		$field.on('validated',function(event,validity) {
+			ok(validity.failedValidator, 'If an added validator fails, the validity "failedValidator" field should be true.');
+		});
+		$form.h5Validate();
+		$field.h5Validate('isValid');
+	});
+
+	test('If no validator name is supplied,the validity "failedValidatorName" property should be null.',function () {
+		var $form = $('#externalValidationForm'),
+			$field = $('#externalValidationFieldNotExampleNotNamed');
+		$.h5Validate.addValidator($field,function(value){return value == 'example';});
+		$field.on('validated',function(event,validity) {
+			equal(validity.failedValidatorName, null, 'If no validator name is supplied,the validity "failedValidatorName" property should be null.');
+		});
+		$form.h5Validate();
+		$field.h5Validate('isValid');
+	});
+
+	test('Supplied validator names should be assigned to the validity "failedValidatorName" property if they exist.',function () {
+		var $form = $('#externalValidationForm'),
+			$field = $('#externalValidationFieldNotExampleNamed'),
+			validatorName = 'exampleValidator';
+		$.h5Validate.addValidator($field,function(value){return value == 'example';},{name: validatorName});
+		$field.on('validated',function(event,validity) {
+			equal(validity.failedValidatorName, validatorName, 'Supplied validator names should be assigned to the validity "failedValidatorName" property if they exist.');
+		});
+		$form.h5Validate();
+		$field.h5Validate('isValid');
+	});
 
   }
   exports.runTests = runTests;
