@@ -24,7 +24,7 @@
 				// HTML5-compatible validation pattern library that can be extended and/or overriden.
 				patternLibrary : { //** TODO: Test the new regex patterns. Should I apply these to the new input types?
 					// **TODO: password
-					phone: /([\+][0-9]{1,3}([ \.\-])?)?([\(][0-9]{1,6}[\)])?([0-9A-Za-z \.\-]{1,32})(([A-Za-z \:]{1,11})?[0-9]{1,4}?)/,
+					phone: /([\+][0-9]{1,3}([ \.\-])?)?([\(]{1}[0-9]{1,6}[\)])?([0-9A-Za-z \.\-]{1,32})(([A-Za-z \:]{1,11})?[0-9]{1,4}?)/,
 
 					// Shamelessly lifted from Scott Gonzalez via the Bassistance Validation plugin http://projects.scottsplayground.com/email_address_validation/
 					email: /((([a-zA-Z]|\d|[!#\$%&'\*\+\-\/=\?\^_`{\|}~]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])+(\.([a-zA-Z]|\d|[!#\$%&'\*\+\-\/=\?\^_`{\|}~]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])+)*)|((\x22)((((\x20|\x09)*(\x0d\x0a))?(\x20|\x09)+)?(([\x01-\x08\x0b\x0c\x0e-\x1f\x7f]|\x21|[\x23-\x5b]|[\x5d-\x7e]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(\\([\x01-\x09\x0b\x0c\x0d-\x7f]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]))))*(((\x20|\x09)*(\x0d\x0a))?(\x20|\x09)+)?(\x22)))@((([a-zA-Z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-zA-Z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-zA-Z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-zA-Z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.)+(([a-zA-Z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-zA-Z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-zA-Z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-zA-Z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.?/,
@@ -70,7 +70,7 @@
 				activeKeyup: true,
 
 				// Setup mouse event delegation.
-				mSelectors: '[type="range"]:not(:disabled):not(.novalidate), :radio:not(:disabled):not(.novalidate), :checkbox:not(:disabled):not(.novalidate), select:not(:disabled):not(.novalidate), option:not(:disabled):not(.novalidate)',
+				mSelectors: '[type="range"]:not(:disabled):not(.novalidate), [type="number"]:not(:disabled):not(.novalidate), :radio:not(:disabled):not(.novalidate), :checkbox:not(:disabled):not(.novalidate), select:not(:disabled):not(.novalidate), option:not(:disabled):not(.novalidate)',
 				click: true,
 
 				// What do we name the required .data variable?
@@ -96,6 +96,9 @@
 				// Elements to validate with allValid (only validating visible elements)
 				allValidSelectors: ':input:visible:not(:button):not(:disabled):not(.novalidate)',
 
+				// Validate also invisble elements
+				//allValidSelectors: ':input:not(:button):not(:disabled):not(.novalidate)',
+
 				// Mark field invalid.
 				// ** TODO: Highlight labels
 				// ** TODO: Implement setCustomValidity as per the spec:
@@ -108,7 +111,7 @@
 					// User needs help. Enable active validation.
 					$element.addClass(options.settings.activeClass);
 
-					if ($errorID.length) { // These ifs are technically not needed, but improve server-side performance 
+					if ($errorID.length) { // These ifs are technically not needed, but improve server-side performance
 						if ($element.attr('title')) {
 							$errorID.text($element.attr('title'));
 						}
@@ -155,9 +158,11 @@
 				rangeUnderflow: validity.rangeUnderflow || false,
 				stepMismatch: validity.stepMismatch || false,
 				tooLong: validity.tooLong || false,
+				tooLow: validity.tooLow || false,
+				tooHigh: validity.tooHigh || false,
 				typeMismatch: validity.typeMismatch || false,
-				valid: validity.valid || true,
-				valueMissing: validity.valueMissing || false
+				valueMissing: validity.valueMissing || false,
+				valid: validity.valid || true
 			}, validity);
 		},
 
@@ -253,13 +258,15 @@
 					errorIDbare = $this.attr(settings.errorAttribute) || false, // Get the ID of the error element.
 					errorID = errorIDbare ? '#' + errorIDbare.replace(/(:|\.|\[|\])/g,'\\$1') : false, // Add the hash for convenience. This is done in two steps to avoid two attribute lookups.
 					required = false,
+					maxlength,
+					min,
+					max,
 					validity = createValidity({element: this, valid: true}),
-					$checkRequired = $('<input required>'),
-					maxlength;
+					$checkRequired = $('<input required>');
 
 				/*	If the required attribute exists, set it required to true, unless it's set 'false'.
-				*	This is a minor deviation from the spec, but it seems some browsers have falsey 
-				*	required values if the attribute is empty (should be true). The more conformant 
+				*	This is a minor deviation from the spec, but it seems some browsers have falsey
+				*	required values if the attribute is empty (should be true). The more conformant
 				*	version of this failed sanity checking in the browser environment.
 				*	This plugin is meant to be practical, not ideologically married to the spec.
 				*/
@@ -277,8 +284,20 @@
 
 				maxlength = parseInt($this.attr('maxlength'), 10);
 				if (!isNaN(maxlength) && value.length > maxlength) {
-						validity.valid = false;	
+						validity.valid = false;
 						validity.tooLong = true;
+				}
+
+				min = parseInt($this.attr('min'), 10);
+				if(!isNaN(min) && (value < min)) {
+					validity.valid = false;
+					validity.tooLow = true;
+				}
+
+				max = parseInt($this.attr('max'), 10);
+				if(!isNaN(max) && (value > max)) {
+					validity.valid = false;
+					validity.tooHigh = true;
 				}
 
 				if (required && !value) {
@@ -333,9 +352,9 @@
 			/**
 			 * Take the event preferences and delegate the events to selected
 			 * objects.
-			 * 
+			 *
 			 * @param {object} eventFlags The object containing event flags.
-			 * 
+			 *
 			 * @returns {element} The passed element (for method chaining).
 			 */
 			delegateEvents: function (selectors, eventFlags, element, settings) {
@@ -359,10 +378,10 @@
 			},
 			/**
 			 * Prepare for event delegation.
-			 * 
+			 *
 			 * @param {object} settings The full plugin state, including
-			 * options. 
-			 * 
+			 * options.
+			 *
 			 * @returns {object} jQuery object for chaining.
 			 */
 			bindDelegation: function (settings) {
@@ -384,7 +403,7 @@
 				$forms
 					.attr('novalidate', 'novalidate')
 					.submit(checkValidityOnSubmitHandler);
-					
+
 				$forms.find("input[formnovalidate][type='submit']").click(function(){
 					$(this).closest("form").unbind('submit', checkValidityOnSubmitHandler);
 				});
@@ -418,9 +437,9 @@
 		 *  - prevents submission if any invalid fields are found.
 		 *  - Optionally validates all fields.
 		 *  - Optionally moves focus to the first invalid field.
-		 * 
-		 * @param {object} evt The jQuery Event object as from the submit event. 
-		 * 
+		 *
+		 * @param {object} evt The jQuery Event object as from the submit event.
+		 *
 		 * @returns {object} undefined if no validation was done, true if validation passed, false if validation didn't.
 		 */
 		checkValidityOnSubmitHandler = function(evt) {
@@ -480,16 +499,17 @@
 			$(this).trigger('instance', { 'data-h5-instanceId': instanceId });
 		};
 
+//valid = $this.h5Validate('isValid', options)
 	$.h5Validate = {
 		/**
 		 * Take a map of pattern names and HTML5-compatible regular
 		 * expressions, and add them to the patternLibrary. Patterns in
 		 * the library are automatically assigned to HTML element pattern
 		 * attributes for validation.
-		 * 
+		 *
 		 * @param {Object} patterns A map of pattern names and HTML5 compatible
 		 * regular expressions.
-		 * 
+		 *
 		 * @returns {Object} patternLibrary The modified pattern library
 		 */
 		addPatterns: function (patterns) {
@@ -506,10 +526,10 @@
 		 * Take a valid jQuery selector, and a list of valid values to
 		 * validate against.
 		 * If the user input isn't in the list, validation fails.
-		 * 
+		 *
 		 * @param {String} selector Any valid jQuery selector.
 		 *
-		 * @param {Array} values A list of valid values to validate selected 
+		 * @param {Array} values A list of valid values to validate selected
 		 * fields against.
 		 */
 		validValues: function (selector, values) {
