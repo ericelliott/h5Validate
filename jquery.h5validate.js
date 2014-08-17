@@ -93,8 +93,8 @@
 				invalidCallback: function () {},
 				validCallback: function () {},
 				
-				// Array of External Validator Functions. View the comment for addValidator for more information.
-				externalValidators: [],
+				// Array of Validator Functions. View the comment for addValidator for more information.
+				validators: [],
 
 				// Elements to validate with allValid (only validating visible elements)
 				allValidSelectors: ':input:visible:not(:button):not(:disabled):not(.novalidate)',
@@ -142,7 +142,7 @@
 					$element.removeClass(options.errorClass).removeClass(options.validClass);
 					$element.form.find("#" + options.element.id).removeClass(options.errorClass).removeClass(options.validClass);
 					return $element;
-				}
+				},
 			}
 		},
 
@@ -153,6 +153,7 @@
 		createValidity = function createValidity(validity) {
 			return $.extend({
 				customError: validity.customError || false,
+				failedValidatorNames: [],
 				patternMismatch: validity.patternMismatch || false,
 				rangeOverflow: validity.rangeOverflow || false,
 				rangeUnderflow: validity.rangeUnderflow || false,
@@ -164,6 +165,66 @@
 			}, validity);
 		},
 
+		/**
+		 * Add builtin validators to h5Validate. Currently, this adds the following validators:
+		 *   Required
+		 *   Maxlength
+		 *   Pattern
+		 * @param  {object}  settings   instance settings
+		 */
+		addBuiltinValidators = function (settings) {
+			settings.validators.push({selector: "*", validator: function(value) {
+				var maxlength = parseInt($(this).attr('maxlength'), 10);
+				return isNaN(maxlength) || value.length <= maxlength;
+			}, options: {
+				validityFailureFlag: 'tooLong',
+				name: 'maxlength',
+			}});
+
+			settings.validators.push({selector: "*", validator: function(value) {
+				var required = false,
+					$checkRequired = $('<input required>'),
+					$this = $(this);
+
+				/*	If the required attribute exists, set it required to true, unless it's set 'false'.
+				*	This is a minor deviation from the spec, but it seems some browsers have falsey 
+				*	required values if the attribute is empty (should be true). The more conformant 
+				*	version of this failed sanity checking in the browser environment.
+				*	This plugin is meant to be practical, not ideologically married to the spec.
+				*/
+				if ($checkRequired.filter('[required]') && $checkRequired.filter('[required]').length) {
+					required = ($this.filter('[required]').length && $this.attr('required') !== 'false');
+				} else {
+					required = ($this.attr('required') !== undefined);
+				}
+
+				return !required || value;
+			}, options: {
+				validityFailureFlag: 'valueMissing',
+				name: 'required',
+			}});
+
+			settings.validators.push({selector: "*", validator: function(value) {
+				// Get the HTML5 pattern attribute if it exists.
+				// ** TODO: If a pattern class exists, grab the pattern from the patternLibrary, but the pattern attrib should override that value.
+				var $this = $(this),
+					pattern = $this.filter('[pattern]')[0] ? $this.attr('pattern') : false,
+					// The pattern attribute must match the whole value, not just a subset:
+					// "...as if it implied a ^(?: at the start of the pattern and a )$ at the end."
+					re = new RegExp('^(?:' + pattern + ')$');
+
+				if (settings.debug && window.console) {
+					console.log('Validate called on "' + value + '" with regex "' + re + '".'); // **DEBUG
+					console.log('Regex test: ' + re.test(value) + ', Pattern: ' + pattern); // **DEBUG
+				}
+
+				return !pattern || re.test(value) || !value;
+			}, options: {
+				validityFailureFlag: 'patternMismatch',
+				name: 'pattern',
+			}});
+		},
+		
 		methods = {
 			/**
 			 * Check the validity of the current field
@@ -234,14 +295,7 @@
 				return valid;
 			},
 			validate: function (settings) {
-				// Get the HTML5 pattern attribute if it exists.
-				// ** TODO: If a pattern class exists, grab the pattern from the patternLibrary, but the pattern attrib should override that value.
 				var $this = $(this),
-					pattern = $this.filter('[pattern]')[0] ? $this.attr('pattern') : false,
-
-					// The pattern attribute must match the whole value, not just a subset:
-					// "...as if it implied a ^(?: at the start of the pattern and a )$ at the end."
-					re = new RegExp('^(?:' + pattern + ')$'),
 					$radiosWithSameName = null,
 					value = ($this.is('[type=checkbox]')) ?
 							$this.is(':checked') : ($this.is('[type=radio]') ?
@@ -255,83 +309,45 @@
 					validClass = settings.validClass,
 					errorIDbare = $this.attr(settings.errorAttribute) || false, // Get the ID of the error element.
 					errorID = errorIDbare ? '#' + errorIDbare.replace(/(:|\.|\[|\])/g,'\\$1') : false, // Add the hash for convenience. This is done in two steps to avoid two attribute lookups.
-					required = false,
-					validity = createValidity({element: this, valid: true}),
-					$checkRequired = $('<input required>'),
-					maxlength;
+					validity = createValidity({element: this, valid: true});
 
-				/*	If the required attribute exists, set it required to true, unless it's set 'false'.
-				*	This is a minor deviation from the spec, but it seems some browsers have falsey 
-				*	required values if the attribute is empty (should be true). The more conformant 
-				*	version of this failed sanity checking in the browser environment.
-				*	This plugin is meant to be practical, not ideologically married to the spec.
-				*/
-				// Feature fork
-				if ($checkRequired.filter('[required]') && $checkRequired.filter('[required]').length) {
-					required = ($this.filter('[required]').length && $this.attr('required') !== 'false');
-				} else {
-					required = ($this.attr('required') !== undefined);
-				}
-
-				if (settings.debug && window.console) {
-					console.log('Validate called on "' + value + '" with regex "' + re + '". Required: ' + required); // **DEBUG
-					console.log('Regex test: ' + re.test(value) + ', Pattern: ' + pattern); // **DEBUG
-				}
-
-				maxlength = parseInt($this.attr('maxlength'), 10);
-				if (!isNaN(maxlength) && value.length > maxlength) {
-						validity.valid = false;	
-						validity.tooLong = true;
-				}
-				
-				// Iterate through the external validators. If any fail, the field fails.
-				for (var i = 0;i<settings.externalValidators.length;i++) {
-					var validator = settings.externalValidators[i].validator;
-					var selector = settings.externalValidators[i].selector;
-					var options = settings.externalValidators[i].options;
+				// Iterate through the validators. If any fail, the field fails.
+				for (var i = 0;i<settings.validators.length;i++) {
+					var validator = settings.validators[i].validator;
+					var selector = settings.validators[i].selector;
+					var options = settings.validators[i].options;
 					if ($(this).is(selector)) {
 						var boundValidator = validator.bind(this);
 						if (!boundValidator(value)) {
 							validity.valid = false;	
 							validity.failedValidator = true;
 							if (options.name) {
-								validity.failedValidatorName = options.name;
+								validity.failedValidatorNames.push(options.name);
+							}
+							if (options.validityFailureFlag) {
+								validity[options.validityFailureFlag] = true;
 							}
 						}
 					}
 				}
-
-				if (required && !value) {
-					validity.valid = false;
-					validity.valueMissing = true;
-				} else if (pattern && !re.test(value) && value) {
-					validity.valid = false;
-					validity.patternMismatch = true;
-				} else {
-					if (!settings.RODom) {
-						settings.markValid({
-							element: this,
-							validity: validity,
-							errorClass: errorClass,
-							validClass: validClass,
-							errorID: errorID,
-							settings: settings
-						});
+								
+				if (!settings.RODom) {
+					var options = {
+						element: this,
+						validity: validity,
+						errorClass: errorClass,
+						validClass: validClass,
+						errorID: errorID,
+						settings: settings
+					};
+					
+					if (validity.valid) {
+						settings.markValid(options);
+					} else {
+						settings.markInvalid(options);
 					}
 				}
 
-				if (!validity.valid) {
-					if (!settings.RODom) {
-						settings.markInvalid({
-							element: this,
-							validity: validity,
-							errorClass: errorClass,
-							validClass: validClass,
-							errorID: errorID,
-							settings: settings
-						});
-					}
-				}
 				$this.trigger('validated', validity);
 
 				// If it's a radio button, also validate the other radio buttons with the same name
@@ -478,6 +494,8 @@
 			// Combine defaults and options to get current settings.
 			var settings = $.extend({}, defaults, options, methods),
 				activeClass = settings.classPrefix + settings.activeClass;
+			
+			addBuiltinValidators(settings);
 
 			return $.extend(settings, {
 				activeClass: activeClass,
@@ -545,14 +563,14 @@
 			$(selector).data('regex', re);
 		},
 		/**
-		 * Takes a selector and a function that is used to do external validation of all fields.
+		 * Takes a selector and a function that is used to do validation of all fields.
 		 * This is useful for doing validation against a webservice
 		 * (e.g. 'http://example.com/is_value_valid/example_value')
 		 * Each validator will be matched using the corresponding selector against every field attached to h5Validate.
 		 * 
-		 * @param {Selector} selector - A jquery selector of the field on which to apply the external validator.
+		 * @param {Selector} selector - A jquery selector of the field on which to apply the validator.
 		 *		example: [name="target-field"]
-		 * @param {Function} validator - An external validator function with the following definition:
+		 * @param {Function} validator - An validator function with the following definition:
 		 *		@param {String} value - The value of the input being validated.
 		 *		@return {Boolean} - The result of the validation (true = pass, false = fail).
 		 *		@this {DOM Element} - The dom element being validated. 
@@ -560,9 +578,9 @@
 		 */
 		addValidator: function(selector, validator, options) {
 			if (!$.isFunction(validator)) {
-				throw new Error('Expected external validator function. Saw ', validator);
+				throw new Error('Expected validator function. Saw ', validator);
 			}
-			defaults.externalValidators.push({selector: selector, validator: validator, options: options || {}} );
+			defaults.validators.push({selector: selector, validator: validator, options: options || {}} );
 		}
 	};
 
