@@ -9,6 +9,45 @@
       ok((typeof $('<div>').h5Validate === 'function'), 'h5Validate exists');
     });
 
+    test('Required validation failure flag false by default:', function () {
+      var $form = $('<form />'),
+        $input = $('<textarea />').appendTo($form);
+
+      $form.appendTo('body').h5Validate();
+
+	  $input.val('Bob');
+	  $input.on('validated',function(event,validity) {
+	    strictEqual(validity.valueMissing, false, 'If the required validator does not fail, the validity property "valueMissing" should be false.');
+	  });
+      $input.h5Validate('isValid');
+    });
+
+    test('Maxlength validation failure flag false by default:', function () {
+      var $form = $('<form />'),
+        $input = $('<textarea />').appendTo($form);
+
+      $form.appendTo('body').h5Validate();
+
+	  $input.val('Bob');
+	  $input.on('validated',function(event,validity) {
+	    strictEqual(validity.tooLong, false, 'If the maxlength validator does not fail, the validity property "tooLong" should be false.');
+	  });
+      $input.h5Validate('isValid');
+    });
+
+    test('Pattern validation failure flag false by default:', function () {
+      var $form = $('<form />'),
+        $input = $('<textarea />').appendTo($form);
+
+      $form.appendTo('body').h5Validate();
+
+	  $input.val('Bob');
+	  $input.on('validated',function(event,validity) {
+	    strictEqual(validity.patternMismatch, false, 'If the pattern validator does not fail, the validity property "patternMismatch" should be false.');
+	  });
+      $input.h5Validate('isValid');
+    });
+
     test('Required:', function () {
       var $input = $('#name');
       ok((!$input.h5Validate('isValid')), 'Required input should be invalid when empty.');
@@ -17,7 +56,7 @@
       $input.val('');
     });
 
-    test('Missing required flag:', function () {
+    test('Required validation failure flag set:', function () {
       var $input = $('#name');
       $input.val('');
 	  $input.on('validated',function(event,validity) {
@@ -35,7 +74,7 @@
       ok((!$input.h5Validate('isValid')), 'Input should be invalid when given invalid input.');
     });
 
-    test('Missing pattern flag:', function () {
+    test('Pattern validation failure flag set:', function () {
       var $input = $('#birthdate');
       $input.val('foo');
 	  $input.on('validated',function(event,validity) {
@@ -44,7 +83,7 @@
       $input.h5Validate('isValid');
 	});
 
-    test('Missing maxlength flag', function () {
+    test('Maxlength validation failure flag set', function () {
       var $input = $('#short-answer');
       $input.val('something longer than 10 characters');
 	  $input.on('validated',function(event,validity) {

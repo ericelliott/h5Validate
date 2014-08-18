@@ -154,14 +154,11 @@
 			return $.extend({
 				customError: validity.customError || false,
 				failedValidatorNames: [],
-				patternMismatch: validity.patternMismatch || false,
 				rangeOverflow: validity.rangeOverflow || false,
 				rangeUnderflow: validity.rangeUnderflow || false,
 				stepMismatch: validity.stepMismatch || false,
-				tooLong: validity.tooLong || false,
 				typeMismatch: validity.typeMismatch || false,
 				valid: validity.valid || true,
-				valueMissing: validity.valueMissing || false
 			}, validity);
 		},
 
@@ -313,9 +310,17 @@
 
 				// Iterate through the validators. If any fail, the field fails.
 				for (var i = 0;i<settings.validators.length;i++) {
-					var validator = settings.validators[i].validator;
-					var selector = settings.validators[i].selector;
-					var options = settings.validators[i].options;
+					var validator = settings.validators[i].validator,
+						selector = settings.validators[i].selector,
+						options = settings.validators[i].options,
+						setFailureFlag = false;
+					
+					// We don't want to overwrite any of the other validity properties (such as "valid")
+					if (options.validityFailureFlag && !validity.hasOwnProperty(options.validityFailureFlag)) {
+						setFailureFlag = true;
+						validity[options.validityFailureFlag] = false;
+					}
+					
 					if ($(this).is(selector)) {
 						var boundValidator = validator.bind(this);
 						if (!boundValidator(value)) {
@@ -324,7 +329,7 @@
 							if (options.name) {
 								validity.failedValidatorNames.push(options.name);
 							}
-							if (options.validityFailureFlag) {
+							if (setFailureFlag) {
 								validity[options.validityFailureFlag] = true;
 							}
 						}
