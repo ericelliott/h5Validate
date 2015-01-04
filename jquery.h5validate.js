@@ -1,14 +1,11 @@
 /**
  * h5Validate
- * @version v0.9.1
- * Using semantic versioning: http://semver.org/
- * @author Eric Hamilton http://ericleads.com/
- * @copyright 2010 - 2012 Eric Hamilton
+ * 
  * Dual licensed under the MIT and GPL licenses:
  * http://www.opensource.org/licenses/mit-license.php
  * http://www.gnu.org/licenses/gpl.html
  *
- * Developed under the sponsorship of RootMusic, Zumba Fitness, LLC, and Rese Property Management
+ * Developed under the sponsorship of RootMusic, and Zumba Fitness
  */
 
 /*global jQuery, window, console */
