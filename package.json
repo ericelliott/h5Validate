@@ -1,6 +1,8 @@
 {
-  "name": "h5Validate",
+  "name": "h5validate",
+  "main": "jquery.h5validate",
   "version": "0.9.1",
+  "license": "MIT",
   "description": "HTML5 form validation",
   "author": {
     "name": "Eric Elliott",
@@ -25,8 +27,5 @@
   },
   "scripts": {
     "test": "./scripts/test.sh"
-  },
-  "engines": {
-    "node": "~0.x.x"
   }
 }
