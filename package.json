@@ -2,6 +2,7 @@
   "name": "h5validate",
   "main": "jquery.h5validate",
   "version": "0.9.1",
+  "license": "MIT",
   "description": "HTML5 form validation",
   "author": {
     "name": "Eric Elliott",
