@@ -10,6 +10,6 @@ For demo and usage, see <a href="http://ericleads.com/h5validate">the h5Validate
 
 ## Status
 
-A lot has changed since I wrote this library in 2010. So much, in fact, that I've started a new project based on the great work we did here. It's called [h5v2](https://github.com/ericelliott/h5v2). It's brand new, we haven't even ported the unit tests, yet.
+A lot has changed since I wrote this library in 2010. It has been several years since I used the library myself. I leave it here because other people might find it useful. There are some open issues, and I have no intention of updating or maintaining this library myself. Pull requests are welcome.
 
-Wouldn't you like a library like h5Validate written to work with node-style modules, Browserify, and web components? I'd love your help. [Take a look at the issues and contribute!](https://github.com/ericelliott/h5v2/issues)
+If you'd like to become the new maintainer of this project, open an issue and we'll discuss it.
