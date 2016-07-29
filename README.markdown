@@ -1,4 +1,4 @@
-# <a href="http://ericleads.com/h5validate">h5Validate</a>
+# h5Validate
 
 Hi,
 
