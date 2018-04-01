@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 	<head>
 		<title>h5Validate - The HTML5 Form Validation Plugin for jQuery</title>
-<!-- 	
-		<script type="text/javascript" src="http://js.getexceptional.com/exceptional.js"></script> 
+<!--
+		<script type="text/javascript" src="http://js.getexceptional.com/exceptional.js"></script>
 		<script type="text/javascript">
 		  Exceptional.setKey('e778cbe66170d28dc9233629cec1edba8c98113a');
 		</script>
@@ -30,11 +30,11 @@
 		<header>
 		<h1>h5Validate - HTML5 Form Validation for jQuery</h1>
 
-		<a class="button" href="http://github.com/dilvie/h5Validate/archives/master">Download from Github</a>
+		<a class="button" href="http://github.com/ericelliott/h5Validate/archives/master">Download from Github</a>
 
 		<br /><br />
-		
-		<p>If you want to contribute, feel free to <a href="http://github.com/dilvie/h5Validate">fork the project on Github</a>.</p>
+
+		<p>If you want to contribute, feel free to <a href="http://github.com/ericelliott/h5Validate">fork the project on Github</a>.</p>
 
 		<p>Best practice realtime HTML5 form validation for jQuery. Works on all popular browsers, including old ones like IE6.</p>
 
@@ -62,7 +62,7 @@
 
 		<h2>Features</h2>
 
-		<h3>HTML5 required attribute. e.g.</h3>		
+		<h3>HTML5 required attribute. e.g.</h3>
 
 		<form id="form1" class="h5-defaults">
 		<label for="name">Your Name:*</label>
@@ -83,27 +83,27 @@
 		</form>
 		<p><em>Hint: It's expecting mm/dd/yyyy. Try typing "jQuery rocks!" instead.</em></p>
 
-		
+
 		<h4>Source:</h4>
-		
+
 		<script src="http://gist.github.com/607739.js?file=h5-pattern-demo-part.html"></script>
 
 		<h3>Pattern Library</h3>
-		
+
 		<p>Sometimes, you'll want to re-use the same validation pattern for several elements on a page. You could copy and paste the same pattern over and over again to a bunch of different form fields, but what happens if you discover a bug in the pattern? Fix it and repeat the whole copy and paste process?</p>
-		
+
 		<p>A better solution is to attach the pattern with a class selector. Use <a href="#addPatterns"><code>$.h5Validate.addPatterns()</code></a> to add your pattern, make sure the classPrefix variable is set correctly (it's <code>h5-</code> by default), and add the class to the input fields.</p>
-		
+
 		<form class="h5-defaults">
 			<label for="email">Email:</label>
 			<input id="email" type="text" class="h5-email" required />
 		</form>
-		
+
 		<h4>Source:</h4>
 		<script src="https://gist.github.com/814972.js?file=gistfile1.phtml"></script>
-		
+
 		<h3>Error Messages</h3>
-		
+
 		<p>Error divs should be hidden in the HTML with <code>display:none;</code> -- h5Validate shows them when the corresponding field is marked invalid.</p>
 
 		<form id="form4" class="h5-defaults">
@@ -113,9 +113,9 @@
 		</form>
 
 		<h2>Options</h2>
-				
+
 		<p>There are a <em>ton</em> of options you can override by passing key: value pairs when you call .h5Validate(). For example, we can change the CSS class that indicates validation errors:</p>
-		
+
 		<form id="black">
 		<label for="name2">Your Name:*</label>
 		<input id="name2" name="name2" type="text" placeholder="Bob" title="Your name is required." required />
@@ -123,11 +123,11 @@
 		</form>
 
 		<h4>Source:</h4>
-		<script src="http://gist.github.com/607750.js?file=h5-setting-options-part.html"></script>		 
-		
+		<script src="http://gist.github.com/607750.js?file=h5-setting-options-part.html"></script>
+
 		<dl>
 		<dt>errorClass</dt><dd><p>Custom CSS class for validation errors.</p></dd>
-		<dt>validClass</dt><dd><p>Custom CSS class to mark a field validated.</p></dd>		
+		<dt>validClass</dt><dd><p>Custom CSS class to mark a field validated.</p></dd>
 		<dt>errorAttribute</dt><dd><p>An html attribute that stores the ID of the error message container for this element. It's set to data-h5-errorid by default. <em>Note: The data- attribute prefix is a new feature of HTML5, used to store an element's meta-data.</em> e.g.</p>
 			<code class="block">&lt;input id="name" data-h5-errorid="nameError" required &gt;</code>
 		</dd>
@@ -193,15 +193,15 @@
 				<dl><dt>{object} patterns</dt><dd><p>A map of pattern names and
 				HTML5 compatible regular expressions.</p></dd></dl>
 
-		<h3>Demo</h3>		
+		<h3>Demo</h3>
 		<form id="form3" class="h5-defaults">
 		<label for="phone">Your Phone Number:</label>
 		<input class="h5-phone" id="phone" name="phone" type="text" placeholder="555-555-5555" title="555-555-5555" />
 		</form>
-				
+
 		<h3>Source:</h3>
-		
-		<script src="http://gist.github.com/612886.js?file=h5-class-selectors-part.html"></script>		
+
+		<script src="http://gist.github.com/612886.js?file=h5-class-selectors-part.html"></script>
 
 		<p>The <code>class="h5-phone"</code> bit is the part doing the magic. The <code>h5-</code> prefix tells you that this class is a handle that we can use to attach validation rules to. Internally, we just tack this prefix to the front of the pattern names to get the right selectors.</p>
 
@@ -219,7 +219,7 @@
 			<dl>
 				<dt>{String} selector</dt><dd><p>Any valid jQuery selector.</p></dd>
 
-				<dt>{Array} values</dt><dd><p>A list of valid values to validate selected 
+				<dt>{Array} values</dt><dd><p>A list of valid values to validate selected
 					fields against.</p></dd>
 			</dl>
 		</dl>
@@ -230,7 +230,7 @@
 
 		<div class="announce">
 			<p><strong>Warning:</strong> Each browser has its own way of treating these new input types. iOS might swap out the on-screen keyboard (cool!), while Chrome renders custom UI controls that don't always make sense (like up and down arrows for <code>datetime</code> inputs.)</p>
-			
+
 			<p>What's worse, some of the styles that get applied to these elements are browser-specific, and ignore CSS cascading -- so before you can add your own look and feel, you first have to turn off each native browser's look and feel. For example, h5Validate works just fine on that search field down there, but in Chrome, it ignores our CSS because you first have to turn off <code>-webkit-appearance: searchfield;</code> before you style it. (Hint: You may want to search for a good HTML5 CSS reset). I've left it as is to demonstrate how irritating all of this can be. Good luck, and don't say I didn't warn you.</p>
 		</div>
 
@@ -278,7 +278,7 @@
 		$(document).ready(function () {
 
 			$.h5Validate.addPatterns({
-					phone: /([\+][0-9]{1,3}([ \.\-])?)?([\(][0-9]{3}[\)])?([0-9A-Z \.\-]{1,32})((x|ext|extension)?[0-9]{1,4}?)/				
+					phone: /([\+][0-9]{1,3}([ \.\-])?)?([\(][0-9]{3}[\)])?([0-9A-Z \.\-]{1,32})((x|ext|extension)?[0-9]{1,4}?)/
 			});
 		    $('form.h5-defaults').h5Validate();
 			$('#black').h5Validate({

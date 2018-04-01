@@ -1,4 +1,4 @@
-# h5Validate
+# h5Validate (WARNING -- DEPRECATED)
 
 Hi,
 
