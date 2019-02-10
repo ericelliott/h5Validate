@@ -1,4 +1,4 @@
-# h5Validate (WARNING -- DEPRECATED)
+# h5Validate (WARNING -- DEPRECATED -- ARCHIVED)
 
 Hi,
 
@@ -8,9 +8,7 @@ In browsers that do support HTML5, h5Validate adds some much-needed features, su
 
 ## Status
 
-A lot has changed since I wrote this library in 2010. It has been several years since I used the library myself. I leave it here because other people might find it useful. There are some open issues, and I have **no intention of updating or maintaining this library myself**. Pull requests are welcome.
-
-If you'd like to become the new maintainer of this project, open an issue and we'll discuss it.
+A lot has changed since I wrote this library in 2010. It has been several years since I used the library myself. I leave it here because other people might find it useful. There are some open issues, and I have **no intention of updating or maintaining this library myself**. This project is now and will always remain unmaintained. If you would like to use this code, please fork and maintain your own copy.
 
 ## Documentation
 
