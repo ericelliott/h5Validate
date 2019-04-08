@@ -49,7 +49,7 @@
 				requiredClass: 'required',
 				requiredAttribute: 'required',
 				patternAttribute: 'pattern',
-
+				combineClassPattern: true,
 				// Attribute which stores the ID of the error container element (without the hash).
 				errorAttribute: 'data-h5-errorid',
 
@@ -229,13 +229,22 @@
 			},
 			validate: function (settings) {
 				// Get the HTML5 pattern attribute if it exists.
-				// ** TODO: If a pattern class exists, grab the pattern from the patternLibrary, but the pattern attrib should override that value.
 				var $this = $(this),
 					pattern = $this.filter('[pattern]')[0] ? $this.attr('pattern') : false,
-
-					// The pattern attribute must match the whole value, not just a subset:
-					// "...as if it implied a ^(?: at the start of the pattern and a )$ at the end."
-					re = new RegExp('^(?:' + pattern + ')$'),
+					classPattern = '';
+                
+	                	//Get any class pattern from class names
+			        $.each(settings.patternLibrary, function (key, value) {
+			            if ($this.hasClass(settings.classPrefix + key)) {
+			                classPattern = value.toString();
+			                classPattern = classPattern.substring(1, classPattern.length - 1);
+			            }
+			        });
+			        
+				// The pattern attribute must match the whole value, not just a subset:
+				// "...as if it implied a ^(?: at the start of the pattern and a )$ at the end."
+				var re = new RegExp('^(?:' + pattern + ')$'),
+					reClass = new RegExp('^(?:' + classPattern + ')$'),
 					$radiosWithSameName = null,
 					value = ($this.is('[type=checkbox]')) ?
 							$this.is(':checked') : ($this.is('[type=radio]') ?
@@ -277,14 +286,31 @@
 						validity.valid = false;	
 						validity.tooLong = true;
 				}
-
+				
+				//Check for required and value first.  If combineClassPattern value must satisfy both
+		        	//pattern and classPattern. Else custom pattern is checked first, and if there's no 
+		        	//custom pattern use class pattern for test.
 				if (required && !value) {
-					validity.valid = false;
-					validity.valueMissing = true;
-				} else if (pattern && !re.test(value) && value) {
-					validity.valid = false;
-					validity.patternMismatch = true;
-				} else {
+			            validity.valid = false;
+			            validity.valueMissing = true;
+			        } else if (settings.combineClassPattern) {
+			            if (((pattern ? !re.test(value) : false) || (classPattern ? !reClass.test(value) : false)) && value) {
+			                validity.valid = false;
+			                validity.patternMismatch = true;
+			            } else {
+			                validity.valid = true;
+			            }
+			        } else {
+		                    var checkRegex = pattern ? re : reClass,
+			                checkPattern = pattern || classPattern;
+		                    if (checkPattern && !checkRegex.test(value) && value) {
+			                validity.valid = false;
+			                validity.patternMismatch = true;
+			            } else {
+			                validity.valid = true; // redundant?
+			            }
+			        } 
+			        if (validity.valid) {
 					if (!settings.RODom) {
 						settings.markValid({
 							element: this,
@@ -295,9 +321,7 @@
 							settings: settings
 						});
 					}
-				}
-
-				if (!validity.valid) {
+				} else {
 					if (!settings.RODom) {
 						settings.markInvalid({
 							element: this,
@@ -365,14 +389,6 @@
 			bindDelegation: function (settings) {
 				var $this = $(this),
 					$forms;
-				// Attach patterns from the library to elements.
-				// **TODO: pattern / validation method matching should
-				// take place inside the validate action.
-				$.each(patternLibrary, function (key, value) {
-					var pattern = value.toString();
-					pattern = pattern.substring(1, pattern.length - 1);
-					$('.' + settings.classPrefix + key).attr('pattern', pattern);
-				});
 
 				$forms = $this.filter('form')
 						.add($this.find('form'))
