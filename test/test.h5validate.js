@@ -9,12 +9,60 @@
       ok((typeof $('<div>').h5Validate === 'function'), 'h5Validate exists');
     });
 
+    test('Required validation failure flag false by default:', function () {
+      var $form = $('<form />'),
+        $input = $('<textarea />').appendTo($form);
+
+      $form.appendTo('body').h5Validate();
+
+	  $input.val('Bob');
+	  $input.on('validated',function(event,validity) {
+	    strictEqual(validity.valueMissing, false, 'If the required validator does not fail, the validity property "valueMissing" should be false.');
+	  });
+      $input.h5Validate('isValid');
+    });
+
+    test('Maxlength validation failure flag false by default:', function () {
+      var $form = $('<form />'),
+        $input = $('<textarea />').appendTo($form);
+
+      $form.appendTo('body').h5Validate();
+
+	  $input.val('Bob');
+	  $input.on('validated',function(event,validity) {
+	    strictEqual(validity.tooLong, false, 'If the maxlength validator does not fail, the validity property "tooLong" should be false.');
+	  });
+      $input.h5Validate('isValid');
+    });
+
+    test('Pattern validation failure flag false by default:', function () {
+      var $form = $('<form />'),
+        $input = $('<textarea />').appendTo($form);
+
+      $form.appendTo('body').h5Validate();
+
+	  $input.val('Bob');
+	  $input.on('validated',function(event,validity) {
+	    strictEqual(validity.patternMismatch, false, 'If the pattern validator does not fail, the validity property "patternMismatch" should be false.');
+	  });
+      $input.h5Validate('isValid');
+    });
+
     test('Required:', function () {
       var $input = $('#name');
       ok((!$input.h5Validate('isValid')), 'Required input should be invalid when empty.');
       $input.val('Bob');
       ok(($input.h5Validate('isValid')), 'Required input should be valid when not empty.');
       $input.val('');
+    });
+
+    test('Required validation failure flag set:', function () {
+      var $input = $('#name');
+      $input.val('');
+	  $input.on('validated',function(event,validity) {
+	    ok(validity.valueMissing, 'If the required validator fails, the validity property "valueMissing" should be true.');
+	  });
+      $input.h5Validate('isValid');
     });
 
     test('Pattern attribute:', function () {
@@ -26,6 +74,24 @@
       ok((!$input.h5Validate('isValid')), 'Input should be invalid when given invalid input.');
     });
 
+    test('Pattern validation failure flag set:', function () {
+      var $input = $('#birthdate');
+      $input.val('foo');
+	  $input.on('validated',function(event,validity) {
+	    ok(validity.patternMismatch, 'If the pattern validator fails, the validity property "patternMismatch" should be true.');
+	  });
+      $input.h5Validate('isValid');
+	});
+
+    test('Maxlength validation failure flag set', function () {
+      var $input = $('#short-answer');
+      $input.val('something longer than 10 characters');
+	  $input.on('validated',function(event,validity) {
+		ok(validity.tooLong, 'If the maxlength validator fails, the validity property "tooLong" should be true.');
+      });
+      $input.h5Validate('isValid');
+    });
+	  
     test('Pattern library:', function () {
       var $input = $('#email');
       $input.val('test@example.com');
@@ -301,6 +367,128 @@
 
       $form.empty().remove();
     });	
+
+	test('Adding an validator should fail for non functions',function () {
+		raises(function() {
+			$.h5Validate.addValidator('[name="target-field"]',5);
+		}, Error, 'Should not be able to add an integer as an validator.');
+
+		raises(function() {
+			$.h5Validate.addValidator('[name="target-field"]','5');
+		}, Error, 'Should not be able to add a string as an validator.');
+
+		raises(function() {
+			$.h5Validate.addValidator('[name="target-field"]',null);
+		}, Error, 'Should not be able to add a null as an validator.');
+
+		raises(function() {
+			$.h5Validate.addValidator('[name="target-field"]',{});
+		}, Error, 'Should not be able to add an object as an validator.');
+
+		raises(function() {
+			$.h5Validate.addValidator('[name="target-field"]',[]);
+		}, Error, 'Should not be able to add an array as an validator.');
+	});
+
+	test('Adding an validator should succeed for functions',function () {
+		$.h5Validate.addValidator('[name="target-field"]',function(){return true;});
+		ok(true, 'Should be able to add a function as an validator without causing an exception.');
+	});
+
+	test('Adding an validator that returns true should not cause validation to fail.',function () {
+		var $form = $('#validationForm'),
+			$field = $('#validationFieldPass');
+		$.h5Validate.addValidator($field,function(){return true;});
+		$form.h5Validate();
+		equal($field.h5Validate('isValid'), true, 'Adding an validator that returns true should not cause validation to fail.');
+	});
+
+	test('Adding an validator that returns false should cause validation to fail.',function () {
+		var $form = $('#validationForm'),
+			$field = $('#validationFieldFail');
+		$.h5Validate.addValidator($field,function(){return false;});
+		$form.h5Validate();
+		equal($field.h5Validate('isValid'), false, 'Adding an validator that returns false should cause validation to fail.');
+	});
+
+	test('Adding an validator that confirms the value of the input should not cause validation to fail.',function () {
+		var $form = $('#validationForm'),
+			$field = $('#validationFieldExample');
+		$.h5Validate.addValidator($field,function(value){return value == 'example';});
+		$form.h5Validate();
+		equal($field.h5Validate('isValid'), true, 'Adding an validator that confirms the value of the input should not cause validation to fail.');
+	});
+
+	test('Adding an validator that disconfirms the value of the input should cause validation to fail.',function () {
+		var $form = $('#validationForm'),
+			$field = $('#validationFieldNotExample');
+		$.h5Validate.addValidator($field,function(value){return value == 'example';});
+		$form.h5Validate();
+		equal($field.h5Validate('isValid'), false, 'Adding an validator that disconfirms the value of the input should cause validation to fail.');
+	});
+
+	test('Adding an validator to a selector that does not exist should not cause validation to fail.',function () {
+		var $form = $('#validationFormPass');
+		$.h5Validate.addValidator('atagthatdoesntexistinhtml',function(){return false;});
+		$form.h5Validate();
+		equal($form.h5Validate('allValid'), true, 'Adding an validator to a selector that does not exist should not cause validation to fail.');
+	});
+
+	test('validators should be passed the value of the DOM element.',function () {
+		var $form = $('#validationForm'),
+			$field = $('#validationFieldExample');
+		$.h5Validate.addValidator($field,function(value) {
+			equal(value, $field.val(), 'validators should be passed the value of the DOM element.');
+			return true;
+		});
+		$form.h5Validate();
+		$field.h5Validate('isValid');
+	});
+
+	test('validators should be run in the context of the DOM element of the target field.',function () {
+		var $form = $('#validationForm'),
+			$field = $('#validationFieldExample');
+		$.h5Validate.addValidator($field,function() {
+			equal(this, $field.get(0), 'validators should be run in the context of the DOM element of the target field.');
+			return true;
+		});
+		$form.h5Validate();
+		$field.h5Validate('isValid');
+	});
+
+	test('If an added validator fails, the validity "failedValidator" field should be true.',function () {
+		var $form = $('#validationForm'),
+			$field = $('#validationFieldNotExampleNotNamed');
+		$.h5Validate.addValidator($field,function(value){return value == 'example';});
+		$field.on('validated',function(event,validity) {
+			ok(validity.failedValidator, 'If an added validator fails, the validity "failedValidator" field should be true.');
+		});
+		$form.h5Validate();
+		$field.h5Validate('isValid');
+	});
+
+	test('If no validator name is supplied,the validity "failedValidatorNames" property should be null.',function () {
+		var $form = $('#validationForm'),
+			$field = $('#validationFieldNotExampleNotNamed');
+		$.h5Validate.addValidator($field,function(value){return value == 'example';});
+		$field.on('validated',function(event,validity) {
+			deepEqual(validity.failedValidatorNames, [], 'If no validator name is supplied,the validity "failedValidatorNames" property should be an empty array.');
+		});
+		$form.h5Validate();
+		$field.h5Validate('isValid');
+	});
+
+	test('Supplied validator names should be assigned to the validity "failedValidatorNames" property if they exist.',function () {
+		var $form = $('#validationForm'),
+			$field = $('#validationFieldNotExampleNamed'),
+			validatorName = 'exampleValidator';
+		$.h5Validate.addValidator($field,function(value){return value == 'example';},{name: validatorName});
+		$field.on('validated',function(event,validity) {
+			deepEqual(validity.failedValidatorNames, [validatorName], 'Supplied validator names should be assigned to the validity "failedValidatorNames" property if they exist.');
+		});
+		$form.h5Validate();
+		$field.h5Validate('isValid');
+	});
 
   }
   exports.runTests = runTests;

@@ -71,7 +71,12 @@
 		</form>
 		<p><em>Hint: It's expecting mm/dd/yyyy. Try typing "jQuery rocks!" instead.</em></p>
 
-		
+		<h3>HTMTL5 maxlength attribute. e.g.</h3>
+
+		<form class="h5-defaults">
+		<label for="short-answer">Short Answer:</label>
+		<input id="short-answer" name="answer" type="text" placeholder="shortanswr" title="Short Answer" maxlength="10" />
+		</form>
 
 		<h3>Pattern Library</h3>
 		
@@ -257,6 +262,21 @@
 				<input id="badInput" type="text" required/>
 				<input id="normalSubmit" type="submit" value="submit"/>
 				<input id="bypassSubmit" type="submit" formnovalidate="formnovalidate"/>
+			</form>
+		</section>
+		
+		<section>
+			<h2>Form Validation Tests</h2>
+			<form id="validationForm">
+				<input id="validationFieldPass" type="text" />
+				<input id="validationFieldFail" type="text" />
+				<input id="validationFieldExample" type="text" value="example" />
+				<input id="validationFieldNotExample" type="text" value="notexample" />
+				<input id="validationFieldNotExampleNotNamed" type="text" value="notexample" />
+				<input id="validationFieldNotExampleNamed" type="text" value="notexample" />
+			</form>
+			<form id="validationFormPass">
+				<input id="validationFieldUnused" type="text" />
 			</form>
 		</section>
 
